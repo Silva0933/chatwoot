@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 env:
-  GITHUB_REPO: ghcr.io/${{ github.repository }}
+  GITHUB_REPO: ghcr.io/silva0933/chatwoot
 
 jobs:
   build:
@@ -125,15 +125,15 @@ jobs:
         run: |
           SANITIZED_REF=$(echo "$GIT_REF" | sed 's/\//-/g')
           docker buildx imagetools create \
-            -t ghcr.io/${{ github.repository }}:${SANITIZED_REF} \
-            -t ghcr.io/${{ github.repository }}:latest \
-            $(printf 'ghcr.io/${{ github.repository }}@sha256:%s ' *)
+            -t ghcr.io/silva0933/chatwoot:${SANITIZED_REF} \
+            -t ghcr.io/silva0933/chatwoot:latest \
+            $(printf 'ghcr.io/silva0933/chatwoot@sha256:%s ' *)
 
       - name: Inspect image
         env:
           GIT_REF: ${{ github.event.release.tag_name || github.ref_name }}
         run: |
           SANITIZED_REF=$(echo "$GIT_REF" | sed 's/\//-/g')
-          REPO="ghcr.io/${{ github.repository }}"
+          REPO="ghcr.io/silva0933/chatwoot"
           docker buildx imagetools inspect ${REPO}:${SANITIZED_REF}
           docker buildx imagetools inspect ${REPO}:latest
