@@ -72,7 +72,11 @@
       "MEMBERS_HINT_RESTRICTED": "Só estes agentes veem este quadro. O rodízio de leads distribui entre eles.",
       "ADD_MEMBER": "Adicionar agente…",
       "REMOVE_MEMBER": "Remover do funil",
-      "NO_AGENTS_LEFT": "Todos os agentes já são membros"
+      "NO_AGENTS_LEFT": "Todos os agentes já são membros",
+      "ROLE": {
+        "MEMBER": "Move cards",
+        "VIEWER": "Só visualiza"
+      }
     },
     "NEW_PIPELINE": {
       "TITLE": "Novo funil",

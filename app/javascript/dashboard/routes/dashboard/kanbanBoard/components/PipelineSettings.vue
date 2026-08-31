@@ -115,6 +115,11 @@ const onAddMember = event => {
 
 const onRemoveMember = userId => dispatch('removeMember', { userId });
 
+const onChangeRole = (userId, role) =>
+  dispatch('updateMemberRole', { userId, role });
+
+const MEMBER_ROLES = ['member', 'viewer'];
+
 
 const stagesExcept = stageId => stages.value.filter(s => s.id !== stageId);
 
@@ -314,6 +319,16 @@ defineExpose({ open });
           <span class="flex-1 min-w-0 text-sm truncate text-n-slate-12">
             {{ member.user.name }}
           </span>
+          <select
+            :value="member.role"
+            :disabled="isSaving"
+            class="px-2 py-1 text-xs border rounded-md border-n-weak bg-n-solid-1 text-n-slate-12"
+            @change="onChangeRole(member.user_id, $event.target.value)"
+          >
+            <option v-for="role in MEMBER_ROLES" :key="role" :value="role">
+              {{ t(`KANBAN.SETTINGS.ROLE.${role.toUpperCase()}`) }}
+            </option>
+          </select>
           <Button
             variant="faded"
             color="ruby"

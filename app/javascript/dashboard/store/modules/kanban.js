@@ -168,6 +168,11 @@ export const actions = {
     await dispatch('fetchMembers', { pipelineId });
   },
 
+  updateMemberRole: async ({ dispatch }, { pipelineId, userId, role }) => {
+    await KanbanMembers.update(pipelineId, userId, role);
+    await dispatch('fetchMembers', { pipelineId });
+  },
+
   removeMember: async ({ dispatch }, { pipelineId, userId }) => {
     await KanbanMembers.delete(pipelineId, userId);
     await dispatch('fetchMembers', { pipelineId });
@@ -235,6 +240,15 @@ export const actions = {
     const { data } = await KanbanTasks.show(task.id);
     const exists = $state.records.some(record => record.id === data.id);
     commit(exists ? types.EDIT_KANBAN_TASK : types.ADD_KANBAN_TASK, data);
+  },
+
+  // Columns are structure, not content: a rename or a reorder has to reach every
+  // open board, and the admin who made the change already has it.
+  syncPipelineFromCable: ({ dispatch, rootGetters }, { pipeline, performer }) => {
+    if (!pipeline) return;
+    if (performer?.id === rootGetters.getCurrentUserID) return;
+
+    dispatch('fetchPipelines');
   },
 
   removeTaskFromCable: ({ commit, state: $state }, { task }) => {

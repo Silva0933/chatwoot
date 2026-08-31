@@ -222,7 +222,7 @@ Rails.application.routes.draw do
                   post :reorder
                 end
               end
-              resources :members, only: [:index, :create, :destroy]
+              resources :members, only: [:index, :create, :update, :destroy]
               resource :automation, only: [:show, :update]
             end
             resources :tasks, only: [:index, :show, :create, :update, :destroy] do

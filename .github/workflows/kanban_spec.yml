@@ -1,0 +1,81 @@
+# Runs the Kanban module's own specs.
+#
+# The repo already has run_foss_spec.yml, but it runs the whole suite across 16
+# Blacksmith runners, which this fork has no access to. This one runs only the
+# Kanban specs on a stock runner, so the module's logic is actually verified on
+# every push rather than only syntax-checked.
+name: Kanban specs
+
+permissions:
+  contents: read
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'app/**/kanban*'
+      - 'app/**/kanban/**'
+      - 'app/listeners/kanban_listener.rb'
+      - 'lib/kanban/**'
+      - 'db/migrate/**'
+      - 'spec/**/kanban/**'
+      - '.github/workflows/kanban_spec.yml'
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  spec:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: ''
+          POSTGRES_DB: postgres
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports:
+          - 5432:5432
+        options: >-
+          --mount type=tmpfs,destination=/var/lib/postgresql/data
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:alpine
+        ports:
+          - 6379:6379
+        options: --entrypoint redis-server
+
+    env:
+      RAILS_ENV: test
+      POSTGRES_HOST: localhost
+      POSTGRES_USERNAME: postgres
+      POSTGRES_PASSWORD: ''
+      REDIS_URL: redis://localhost:6379
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+
+      - name: Strip enterprise code
+        run: |
+          rm -rf enterprise
+          rm -rf spec/enterprise
+
+      - name: Prepare database
+        run: |
+          bundle exec rake db:create
+          bundle exec rake db:schema:load
+
+      - name: Run Kanban specs
+        run: |
+          bundle exec rspec --format documentation \
+            spec/services/kanban \
+            spec/controllers/api/v1/accounts/kanban \
+            spec/listeners/kanban_listener_spec.rb

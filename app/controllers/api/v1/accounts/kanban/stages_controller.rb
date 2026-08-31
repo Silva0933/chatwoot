@@ -1,20 +1,25 @@
 class Api::V1::Accounts::Kanban::StagesController < Api::V1::Accounts::BaseController
+  include Events::Types
+
   before_action :fetch_pipeline
   before_action :fetch_stage, only: [:update, :destroy]
   before_action :check_authorization
 
   def create
     @stage = Kanban::SaveStageService.new(pipeline: @pipeline, params: permitted_params).perform
+    broadcast_pipeline
     render :show
   end
 
   def update
     @stage = Kanban::SaveStageService.new(pipeline: @pipeline, params: permitted_params, stage: @stage).perform
+    broadcast_pipeline
     render :show
   end
 
   def destroy
     Kanban::DestroyStageService.new(stage: @stage, fallback_stage: fallback_stage).perform
+    broadcast_pipeline
     head :ok
   rescue Kanban::DestroyStageService::StageNotEmptyError
     render json: { error: I18n.t('errors.kanban.stage_not_empty') }, status: :unprocessable_entity
@@ -24,10 +29,15 @@ class Api::V1::Accounts::Kanban::StagesController < Api::V1::Accounts::BaseContr
 
   def reorder
     @pipeline = Kanban::ReorderStagesService.new(pipeline: @pipeline, stage_ids: params[:stage_ids]).perform
+    broadcast_pipeline
     render 'api/v1/accounts/kanban/pipelines/show'
   end
 
   private
+
+  def broadcast_pipeline
+    Rails.configuration.dispatcher.dispatch(KANBAN_PIPELINE_UPDATED, Time.zone.now, pipeline: @pipeline.reload)
+  end
 
   def fetch_pipeline
     @pipeline = Current.account.kanban_pipelines.find(params[:pipeline_id])

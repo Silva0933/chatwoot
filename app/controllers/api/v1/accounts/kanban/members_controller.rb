@@ -14,6 +14,12 @@ class Api::V1::Accounts::Kanban::MembersController < Api::V1::Accounts::BaseCont
     render :show
   end
 
+  def update
+    @member = @pipeline.pipeline_members.find_by!(user_id: params[:id])
+    @member.update!(role: params[:role])
+    render :show
+  end
+
   def destroy
     @pipeline.pipeline_members.find_by!(user_id: params[:id]).destroy!
     head :ok

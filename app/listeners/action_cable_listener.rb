@@ -330,6 +330,18 @@ class ActionCableListener < BaseListener # rubocop:disable Metrics/ClassLength
     broadcast_kanban_task(event.data[:task], KANBAN_TASK_MOVED, from_stage_id: event.data[:from_stage_id])
   end
 
+  # Cards were the only thing broadcast, so renaming or reordering a column left
+  # every other agent looking at a board that no longer matched the funnel.
+  def kanban_pipeline_updated(event)
+    pipeline = event.data[:pipeline]
+    account = pipeline.account
+    broadcast(account, user_tokens(account, account.agents), KANBAN_PIPELINE_UPDATED, {
+                pipeline: pipeline.push_event_data.merge(
+                  stages: pipeline.stages.reload.map(&:push_event_data)
+                )
+              })
+  end
+
   def kanban_task_deleted(event)
     account = event.data[:account]
     broadcast(account, user_tokens(account, account.agents), KANBAN_TASK_DELETED, { task: event.data[:task_data] })

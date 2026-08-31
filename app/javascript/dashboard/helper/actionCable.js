@@ -99,6 +99,7 @@ class ActionCableConnector extends BaseActionCableConnector {
       'internal_chat.reaction.created': this.onInternalChatReactionCreated,
       'internal_chat.reaction.deleted': this.onInternalChatReactionDeleted,
       'internal_chat.poll.voted': this.onInternalChatPollVoted,
+      'kanban.pipeline_updated': this.onKanbanPipelineUpdated,
       'kanban.task_created': this.onKanbanTaskCreated,
       'kanban.task_updated': this.onKanbanTaskUpdated,
       'kanban.task_moved': this.onKanbanTaskUpdated,
@@ -509,6 +510,10 @@ class ActionCableConnector extends BaseActionCableConnector {
 
   // The whole payload goes to the store, performer included: the agent who dragged
   // the card already applied it optimistically and must not refetch their own move.
+  onKanbanPipelineUpdated = data => {
+    this.app.$store.dispatch('kanban/syncPipelineFromCable', data);
+  };
+
   onKanbanTaskCreated = data => {
     this.app.$store.dispatch('kanban/syncTaskFromCable', data);
   };

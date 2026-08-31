@@ -57,7 +57,8 @@ class Api::V1::Accounts::Kanban::TasksController < Api::V1::Accounts::BaseContro
   def permitted_params
     params.require(:task).permit(
       :kanban_pipeline_id, :kanban_stage_id, :conversation_id, :contact_id,
-      :assigned_agent_id, :inbox_id, :title, :priority, :due_date, :position
+      :assigned_agent_id, :inbox_id, :title, :priority, :due_date, :position,
+      metadata: {}
     )
   end
 end

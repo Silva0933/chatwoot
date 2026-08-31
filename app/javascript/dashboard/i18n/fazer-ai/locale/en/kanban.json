@@ -72,7 +72,11 @@
       "MEMBERS_HINT_RESTRICTED": "Only these agents see this board. Round-robin distributes leads among them.",
       "ADD_MEMBER": "Add an agent…",
       "REMOVE_MEMBER": "Remove from pipeline",
-      "NO_AGENTS_LEFT": "Every agent is already a member"
+      "NO_AGENTS_LEFT": "Every agent is already a member",
+      "ROLE": {
+        "MEMBER": "Can move cards",
+        "VIEWER": "View only"
+      }
     },
     "NEW_PIPELINE": {
       "TITLE": "New pipeline",

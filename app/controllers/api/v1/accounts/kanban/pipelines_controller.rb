@@ -1,4 +1,6 @@
 class Api::V1::Accounts::Kanban::PipelinesController < Api::V1::Accounts::BaseController
+  include Events::Types
+
   before_action :fetch_pipeline, except: [:index, :create, :templates]
   before_action :check_authorization
 
@@ -25,8 +27,16 @@ class Api::V1::Accounts::Kanban::PipelinesController < Api::V1::Accounts::BaseCo
     render :show
   end
 
+  # The PRD describes this endpoint as updating "name, stages and automations", so
+  # it accepts nested stages even though each also has a resource of its own. They
+  # go through SaveStageService rather than a nested attributes assignment, because
+  # promoting a won stage has to demote the incumbent in the same transaction.
   def update
-    @pipeline.update!(permitted_params.slice(:name, :description, :is_active, :position))
+    ActiveRecord::Base.transaction do
+      @pipeline.update!(permitted_params.slice(:name, :description, :is_active, :position))
+      update_stages if permitted_params[:stages].present?
+    end
+    Rails.configuration.dispatcher.dispatch(KANBAN_PIPELINE_UPDATED, Time.zone.now, pipeline: @pipeline.reload)
     render :show
   end
 
@@ -36,6 +46,14 @@ class Api::V1::Accounts::Kanban::PipelinesController < Api::V1::Accounts::BaseCo
   end
 
   private
+
+  def update_stages
+    permitted_params[:stages].each do |attrs|
+      attrs = attrs.to_h.symbolize_keys
+      stage = @pipeline.stages.find_by(id: attrs[:id])
+      Kanban::SaveStageService.new(pipeline: @pipeline, params: attrs.except(:id), stage: stage).perform
+    end
+  end
 
   def fetch_pipeline
     @pipeline = Current.account.kanban_pipelines.includes(:stages).find(params[:id])
@@ -58,7 +76,7 @@ class Api::V1::Accounts::Kanban::PipelinesController < Api::V1::Accounts::BaseCo
   def permitted_params
     params.require(:pipeline).permit(
       :name, :description, :is_active, :position, :template_key,
-      stages: [:name, :color_hex, :is_won_stage, :is_lost_stage]
+      stages: [:id, :name, :color_hex, :is_won_stage, :is_lost_stage, :position]
     )
   end
 end

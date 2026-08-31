@@ -101,4 +101,5 @@ module Events::Types
   KANBAN_TASK_WON = 'kanban.task_won'
   KANBAN_TASK_LOST = 'kanban.task_lost'
   KANBAN_TASK_DELETED = 'kanban.task_deleted'
+  KANBAN_PIPELINE_UPDATED = 'kanban.pipeline_updated'
 end

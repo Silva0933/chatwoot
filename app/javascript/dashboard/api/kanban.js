@@ -64,6 +64,10 @@ class KanbanMembersAPI extends ApiClient {
     return axios.post(this.membersUrl(pipelineId), { user_id: userId });
   }
 
+  update(pipelineId, userId, role) {
+    return axios.patch(`${this.membersUrl(pipelineId)}/${userId}`, { role });
+  }
+
   delete(pipelineId, userId) {
     return axios.delete(`${this.membersUrl(pipelineId)}/${userId}`);
   }

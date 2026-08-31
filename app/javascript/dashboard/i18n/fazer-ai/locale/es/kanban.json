@@ -72,7 +72,11 @@
       "MEMBERS_HINT_RESTRICTED": "Solo estos agentes ven este tablero. El reparto rotativo distribuye entre ellos.",
       "ADD_MEMBER": "Añadir agente…",
       "REMOVE_MEMBER": "Quitar del embudo",
-      "NO_AGENTS_LEFT": "Todos los agentes ya son miembros"
+      "NO_AGENTS_LEFT": "Todos los agentes ya son miembros",
+      "ROLE": {
+        "MEMBER": "Mueve tarjetas",
+        "VIEWER": "Solo ve"
+      }
     },
     "NEW_PIPELINE": {
       "TITLE": "Nuevo embudo",
