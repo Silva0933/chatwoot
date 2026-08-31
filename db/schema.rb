@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_08_31_140000) do
+ActiveRecord::Schema[7.2].define(version: 2026_08_31_230100) do
   # These extensions should be enabled to support this database
   enable_extension "pg_stat_statements"
   enable_extension "pg_trgm"
@@ -1439,6 +1439,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_08_31_140000) do
     t.string "color_hex", default: "#4A86E8", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "wip_limit"
     t.index ["account_id"], name: "index_kanban_stages_on_account_id"
     t.index ["kanban_pipeline_id", "position"], name: "index_kanban_stages_on_kanban_pipeline_id_and_position"
     t.index ["kanban_pipeline_id"], name: "index_kanban_stages_on_kanban_pipeline_id"
@@ -1478,6 +1479,8 @@ ActiveRecord::Schema[7.2].define(version: 2026_08_31_140000) do
     t.integer "position", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "value_cents", default: 0, null: false
+    t.string "loss_reason"
     t.index ["account_id", "kanban_pipeline_id"], name: "index_kanban_tasks_on_account_id_and_kanban_pipeline_id"
     t.index ["account_id"], name: "index_kanban_tasks_on_account_id"
     t.index ["assigned_agent_id"], name: "index_kanban_tasks_on_assigned_agent_id"
@@ -1485,6 +1488,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_08_31_140000) do
     t.index ["conversation_id"], name: "index_kanban_tasks_on_conversation_id"
     t.index ["inbox_id"], name: "index_kanban_tasks_on_inbox_id"
     t.index ["kanban_pipeline_id", "assigned_agent_id"], name: "index_kanban_tasks_on_kanban_pipeline_id_and_assigned_agent_id"
+    t.index ["kanban_pipeline_id", "value_cents"], name: "index_kanban_tasks_on_kanban_pipeline_id_and_value_cents"
     t.index ["kanban_pipeline_id", "conversation_id"], name: "index_kanban_tasks_one_card_per_conversation", unique: true, where: "(conversation_id IS NOT NULL)"
     t.index ["kanban_pipeline_id"], name: "index_kanban_tasks_on_kanban_pipeline_id"
     t.index ["kanban_stage_id", "position"], name: "index_kanban_tasks_on_kanban_stage_id_and_position"
