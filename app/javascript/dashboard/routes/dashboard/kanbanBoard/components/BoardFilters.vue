@@ -1,7 +1,10 @@
 <script setup>
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { vOnClickOutside } from '@vueuse/components';
 import { useMapGetter } from 'dashboard/composables/store';
+import Button from 'dashboard/components-next/button/Button.vue';
+import DropdownMenu from 'dashboard/components-next/dropdown-menu/DropdownMenu.vue';
 import Icon from 'dashboard/components-next/icon/Icon.vue';
 import { SORT_OPTIONS } from '../constants';
 
@@ -14,6 +17,8 @@ const inboxId = defineModel('inboxId', { type: [Number, String], default: '' });
 const sortBy = defineModel('sortBy', { type: String, default: 'position' });
 
 const { t } = useI18n();
+
+const openMenu = ref(null);
 
 const agents = useMapGetter('agents/getVerifiedAgents');
 const inboxes = useMapGetter('inboxes/getInboxes');
@@ -30,60 +35,121 @@ const presentInboxes = computed(() => {
   return inboxes.value.filter(inbox => ids.has(inbox.id));
 });
 
-const onSelect = (model, value) => {
-  model.value = value === '' ? '' : Number(value);
+const selectedSort = computed(
+  () => SORT_OPTIONS.find(option => option.value === sortBy.value) || SORT_OPTIONS[0]
+);
+
+const menus = computed(() => [
+  {
+    key: 'agent',
+    icon: 'i-lucide-user-round',
+    label:
+      presentAgents.value.find(agent => agent.id === agentId.value)?.name ||
+      t('KANBAN.FILTERS.ALL_AGENTS'),
+    isActive: !!agentId.value,
+    sections: [
+      {
+        label: t('KANBAN.FILTERS.AGENT'),
+        options: [
+          {
+            label: t('KANBAN.FILTERS.ALL_AGENTS'),
+            value: '',
+            action: 'agent',
+            isSelected: !agentId.value,
+          },
+          ...presentAgents.value.map(agent => ({
+            label: agent.name,
+            value: agent.id,
+            action: 'agent',
+            thumbnail: { name: agent.name, src: agent.thumbnail },
+            isSelected: agentId.value === agent.id,
+          })),
+        ],
+      },
+    ],
+  },
+  {
+    key: 'inbox',
+    icon: 'i-lucide-inbox',
+    label:
+      presentInboxes.value.find(inbox => inbox.id === inboxId.value)?.name ||
+      t('KANBAN.FILTERS.ALL_INBOXES'),
+    isActive: !!inboxId.value,
+    sections: [
+      {
+        label: t('KANBAN.FILTERS.INBOX'),
+        options: [
+          {
+            label: t('KANBAN.FILTERS.ALL_INBOXES'),
+            value: '',
+            action: 'inbox',
+            isSelected: !inboxId.value,
+          },
+          ...presentInboxes.value.map(inbox => ({
+            label: inbox.name,
+            value: inbox.id,
+            action: 'inbox',
+            isSelected: inboxId.value === inbox.id,
+          })),
+        ],
+      },
+    ],
+  },
+  {
+    key: 'sort',
+    icon: 'i-lucide-arrow-up-down',
+    label: t(selectedSort.value.labelKey),
+    isActive: sortBy.value !== SORT_OPTIONS[0].value,
+    sections: [
+      {
+        label: t('KANBAN.FILTERS.SORT'),
+        options: SORT_OPTIONS.map(option => ({
+          label: t(option.labelKey),
+          value: option.value,
+          action: 'sort',
+          isSelected: sortBy.value === option.value,
+        })),
+      },
+    ],
+  },
+]);
+
+const toggleMenu = key => {
+  openMenu.value = openMenu.value === key ? null : key;
+};
+
+const closeMenu = () => {
+  openMenu.value = null;
+};
+
+const onAction = ({ action, value }) => {
+  if (action === 'agent') agentId.value = value;
+  if (action === 'inbox') inboxId.value = value;
+  if (action === 'sort') sortBy.value = value;
+  openMenu.value = null;
 };
 </script>
 
 <template>
-  <div class="flex items-center gap-2">
-    <label
-      class="flex items-center gap-1.5 pl-2 pr-1 rounded-lg h-8 border border-n-weak bg-n-solid-2 text-n-slate-11 focus-within:border-n-brand"
-    >
-      <Icon icon="i-lucide-user-round" class="size-3.5 text-n-slate-10" />
-      <span class="sr-only">{{ t('KANBAN.FILTERS.AGENT') }}</span>
-      <select
-        :value="agentId"
-        class="h-full pr-1 text-xs bg-transparent border-0 cursor-pointer text-n-slate-12 focus:outline-none"
-        @change="onSelect(agentId, $event.target.value)"
+  <div v-on-click-outside="closeMenu" class="flex items-center gap-2">
+    <div v-for="menu in menus" :key="menu.key" class="relative">
+      <Button
+        :icon="menu.icon"
+        :color="menu.isActive ? 'blue' : 'slate'"
+        variant="faded"
+        size="sm"
+        :class="{ 'bg-n-slate-9/10': openMenu === menu.key }"
+        @click="toggleMenu(menu.key)"
       >
-        <option value="">{{ t('KANBAN.FILTERS.ALL_AGENTS') }}</option>
-        <option v-for="agent in presentAgents" :key="agent.id" :value="agent.id">
-          {{ agent.name }}
-        </option>
-      </select>
-    </label>
-
-    <label
-      class="flex items-center gap-1.5 pl-2 pr-1 rounded-lg h-8 border border-n-weak bg-n-solid-2 text-n-slate-11 focus-within:border-n-brand"
-    >
-      <Icon icon="i-lucide-inbox" class="size-3.5 text-n-slate-10" />
-      <span class="sr-only">{{ t('KANBAN.FILTERS.INBOX') }}</span>
-      <select
-        :value="inboxId"
-        class="h-full pr-1 text-xs bg-transparent border-0 cursor-pointer text-n-slate-12 focus:outline-none"
-        @change="onSelect(inboxId, $event.target.value)"
-      >
-        <option value="">{{ t('KANBAN.FILTERS.ALL_INBOXES') }}</option>
-        <option v-for="inbox in presentInboxes" :key="inbox.id" :value="inbox.id">
-          {{ inbox.name }}
-        </option>
-      </select>
-    </label>
-
-    <label
-      class="flex items-center gap-1.5 pl-2 pr-1 rounded-lg h-8 border border-n-weak bg-n-solid-2 text-n-slate-11 focus-within:border-n-brand"
-    >
-      <Icon icon="i-lucide-arrow-up-down" class="size-3.5 text-n-slate-10" />
-      <span class="sr-only">{{ t('KANBAN.FILTERS.SORT') }}</span>
-      <select
-        v-model="sortBy"
-        class="h-full pr-1 text-xs bg-transparent border-0 cursor-pointer text-n-slate-12 focus:outline-none"
-      >
-        <option v-for="option in SORT_OPTIONS" :key="option.value" :value="option.value">
-          {{ t(option.labelKey) }}
-        </option>
-      </select>
-    </label>
+        <span class="min-w-0 max-w-[140px] truncate">{{ menu.label }}</span>
+        <Icon icon="i-lucide-chevron-down" class="shrink-0 size-3.5" />
+      </Button>
+      <DropdownMenu
+        v-if="openMenu === menu.key"
+        :menu-sections="menu.sections"
+        class="mt-2 min-w-52 max-h-80 top-full ltr:start-0 rtl:end-0"
+        @action="onAction"
+      />
+    </div>
   </div>
 </template>

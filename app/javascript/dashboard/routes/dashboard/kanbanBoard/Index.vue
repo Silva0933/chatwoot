@@ -156,6 +156,19 @@ const onPipelineDeleted = () => {
         @select="onSelectPipeline"
       />
 
+      <!-- Creating a funnel belongs next to the funnel switcher, not among the
+           actions that operate on the board currently open. -->
+      <Button
+        v-if="isAdmin"
+        variant="ghost"
+        color="slate"
+        size="sm"
+        icon="i-lucide-plus"
+        :title="t('KANBAN.BOARD.NEW_PIPELINE')"
+        :aria-label="t('KANBAN.BOARD.NEW_PIPELINE')"
+        @click="newPipelineRef?.open()"
+      />
+
       <div class="flex items-center flex-shrink-0 gap-2 ml-auto">
         <BoardFilters
           v-model:agent-id="agentFilter"
@@ -179,18 +192,9 @@ const onPipelineDeleted = () => {
           color="slate"
           size="sm"
           icon="i-lucide-settings-2"
+          :title="t('KANBAN.BOARD.SETTINGS')"
           :aria-label="t('KANBAN.BOARD.SETTINGS')"
           @click="settingsRef?.open()"
-        />
-
-        <Button
-          v-if="isAdmin"
-          variant="faded"
-          color="slate"
-          size="sm"
-          icon="i-lucide-git-fork"
-          :aria-label="t('KANBAN.BOARD.NEW_PIPELINE')"
-          @click="newPipelineRef?.open()"
         />
 
         <Button
