@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_08_26_130000) do
+ActiveRecord::Schema[7.2].define(version: 2026_08_31_140000) do
   # These extensions should be enabled to support this database
   enable_extension "pg_stat_statements"
   enable_extension "pg_trgm"
@@ -510,8 +510,8 @@ ActiveRecord::Schema[7.1].define(version: 2026_08_26_130000) do
     t.integer "status", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["account_id"], name: "index_captain_faq_suggestions_on_account_id"
     t.index ["account_id", "assistant_id", "status", "language"], name: "idx_cap_faq_suggestions_on_account_assistant_status_language"
+    t.index ["account_id"], name: "index_captain_faq_suggestions_on_account_id"
     t.index ["assistant_id"], name: "index_captain_faq_suggestions_on_assistant_id"
     t.index ["embedding"], name: "vector_idx_captain_faq_suggestions_embedding", opclass: :vector_cosine_ops, using: :ivfflat
   end
@@ -752,11 +752,11 @@ ActiveRecord::Schema[7.1].define(version: 2026_08_26_130000) do
     t.jsonb "phone_number_health", default: {}, null: false
     t.datetime "phone_number_health_checked_at"
     t.string "phone_number_health_error", limit: 500
-    t.index ["phone_number_health_checked_at"], name: "index_channel_whatsapp_on_phone_number_health_checked_at"
-    t.index ["phone_number"], name: "index_channel_whatsapp_on_phone_number", unique: true
-    t.index "((provider_connection ->> 'connection'::text))", name: "index_channel_whatsapp_connection_state", where: "((provider)::text = ANY (ARRAY[('baileys'::character varying)::text, ('zapi'::character varying)::text, ('native'::character varying)::text, ('uazapi'::character varying)::text]))"
-    t.index ["provider_connection"], name: "index_channel_whatsapp_provider_connection", where: "((provider)::text = ANY (ARRAY[('baileys'::character varying)::text, ('zapi'::character varying)::text]))", using: :gin
     t.index "((provider_config ->> 'session_id'::text))", name: "index_channel_whatsapp_session_id", unique: true, where: "((provider)::text = ANY (ARRAY[('native'::character varying)::text, ('uazapi'::character varying)::text]))"
+    t.index "((provider_connection ->> 'connection'::text))", name: "index_channel_whatsapp_connection_state", where: "((provider)::text = ANY (ARRAY[('baileys'::character varying)::text, ('zapi'::character varying)::text, ('native'::character varying)::text, ('uazapi'::character varying)::text]))"
+    t.index ["phone_number"], name: "index_channel_whatsapp_on_phone_number", unique: true
+    t.index ["phone_number_health_checked_at"], name: "index_channel_whatsapp_on_phone_number_health_checked_at"
+    t.index ["provider_connection"], name: "index_channel_whatsapp_provider_connection", where: "((provider)::text = ANY (ARRAY[('baileys'::character varying)::text, ('zapi'::character varying)::text]))", using: :gin
   end
 
   create_table "companies", force: :cascade do |t|
@@ -1116,10 +1116,10 @@ ActiveRecord::Schema[7.1].define(version: 2026_08_26_130000) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "inbox_id"
-    t.index ["account_id", "name", "template_type", "locale"], name: "index_email_templates_on_account_scope", unique: true, where: "(account_id IS NOT NULL) AND (inbox_id IS NULL)"
+    t.index ["account_id", "name", "template_type", "locale"], name: "index_email_templates_on_account_scope", unique: true, where: "((account_id IS NOT NULL) AND (inbox_id IS NULL))"
     t.index ["inbox_id", "name", "template_type", "locale"], name: "index_email_templates_on_inbox_scope", unique: true, where: "(inbox_id IS NOT NULL)"
     t.index ["inbox_id"], name: "index_email_templates_on_inbox_id"
-    t.index ["name", "template_type", "locale"], name: "index_email_templates_on_installation_scope", unique: true, where: "(account_id IS NULL) AND (inbox_id IS NULL)"
+    t.index ["name", "template_type", "locale"], name: "index_email_templates_on_installation_scope", unique: true, where: "((account_id IS NULL) AND (inbox_id IS NULL))"
   end
 
   create_table "folders", force: :cascade do |t|
@@ -1386,6 +1386,109 @@ ActiveRecord::Schema[7.1].define(version: 2026_08_26_130000) do
     t.index ["internal_chat_message_id", "user_id", "emoji"], name: "idx_ic_reactions_message_user_emoji", unique: true
     t.index ["internal_chat_message_id"], name: "idx_ic_reactions_message"
     t.index ["user_id"], name: "index_internal_chat_reactions_on_user_id"
+  end
+
+  create_table "kanban_automations", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.bigint "kanban_pipeline_id", null: false
+    t.boolean "auto_create_on_conversation", default: true, null: false
+    t.boolean "auto_assign_task_to_agent", default: true, null: false
+    t.boolean "auto_assign_conversation_to_agent", default: true, null: false
+    t.boolean "auto_resolve_conversation_on_finish", default: true, null: false
+    t.boolean "auto_win_task_on_resolve", default: true, null: false
+    t.boolean "round_robin_assignment", default: false, null: false
+    t.bigint "target_inbox_ids", default: [], null: false, array: true
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id"], name: "index_kanban_automations_on_account_id"
+    t.index ["kanban_pipeline_id"], name: "index_kanban_automations_on_kanban_pipeline_id"
+    t.index ["kanban_pipeline_id"], name: "index_kanban_automations_one_per_pipeline", unique: true
+  end
+
+  create_table "kanban_pipeline_members", force: :cascade do |t|
+    t.bigint "kanban_pipeline_id", null: false
+    t.bigint "user_id", null: false
+    t.integer "role", default: 1, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["kanban_pipeline_id", "user_id"], name: "index_kanban_pipeline_members_uniqueness", unique: true
+    t.index ["kanban_pipeline_id"], name: "index_kanban_pipeline_members_on_kanban_pipeline_id"
+    t.index ["user_id"], name: "index_kanban_pipeline_members_on_user_id"
+  end
+
+  create_table "kanban_pipelines", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.string "name", null: false
+    t.text "description"
+    t.boolean "is_active", default: true, null: false
+    t.integer "position", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "is_active"], name: "index_kanban_pipelines_on_account_id_and_is_active"
+    t.index ["account_id", "name"], name: "index_kanban_pipelines_on_account_id_and_name", unique: true
+    t.index ["account_id"], name: "index_kanban_pipelines_on_account_id"
+  end
+
+  create_table "kanban_stages", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.bigint "kanban_pipeline_id", null: false
+    t.string "name", null: false
+    t.integer "position", default: 0, null: false
+    t.boolean "is_won_stage", default: false, null: false
+    t.boolean "is_lost_stage", default: false, null: false
+    t.string "color_hex", default: "#4A86E8", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id"], name: "index_kanban_stages_on_account_id"
+    t.index ["kanban_pipeline_id", "position"], name: "index_kanban_stages_on_kanban_pipeline_id_and_position"
+    t.index ["kanban_pipeline_id"], name: "index_kanban_stages_on_kanban_pipeline_id"
+    t.index ["kanban_pipeline_id"], name: "index_kanban_stages_one_lost_per_pipeline", unique: true, where: "is_lost_stage"
+    t.index ["kanban_pipeline_id"], name: "index_kanban_stages_one_won_per_pipeline", unique: true, where: "is_won_stage"
+  end
+
+  create_table "kanban_task_transitions", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.bigint "kanban_pipeline_id", null: false
+    t.bigint "kanban_task_id", null: false
+    t.bigint "from_stage_id"
+    t.bigint "to_stage_id", null: false
+    t.integer "seconds_in_previous_stage"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id"], name: "index_kanban_task_transitions_on_account_id"
+    t.index ["kanban_pipeline_id", "created_at"], name: "idx_on_kanban_pipeline_id_created_at_ac6c94630a"
+    t.index ["kanban_pipeline_id", "from_stage_id", "to_stage_id"], name: "index_kanban_transitions_on_pipeline_and_stages"
+    t.index ["kanban_pipeline_id"], name: "index_kanban_task_transitions_on_kanban_pipeline_id"
+    t.index ["kanban_task_id"], name: "index_kanban_task_transitions_on_kanban_task_id"
+  end
+
+  create_table "kanban_tasks", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.bigint "kanban_pipeline_id", null: false
+    t.bigint "kanban_stage_id", null: false
+    t.bigint "conversation_id"
+    t.bigint "contact_id", null: false
+    t.bigint "assigned_agent_id"
+    t.bigint "inbox_id"
+    t.string "title", null: false
+    t.integer "priority", default: 1, null: false
+    t.datetime "due_date"
+    t.datetime "stage_entered_at", null: false
+    t.jsonb "metadata", default: {}, null: false
+    t.integer "position", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "kanban_pipeline_id"], name: "index_kanban_tasks_on_account_id_and_kanban_pipeline_id"
+    t.index ["account_id"], name: "index_kanban_tasks_on_account_id"
+    t.index ["assigned_agent_id"], name: "index_kanban_tasks_on_assigned_agent_id"
+    t.index ["contact_id"], name: "index_kanban_tasks_on_contact_id"
+    t.index ["conversation_id"], name: "index_kanban_tasks_on_conversation_id"
+    t.index ["inbox_id"], name: "index_kanban_tasks_on_inbox_id"
+    t.index ["kanban_pipeline_id", "assigned_agent_id"], name: "index_kanban_tasks_on_kanban_pipeline_id_and_assigned_agent_id"
+    t.index ["kanban_pipeline_id", "conversation_id"], name: "index_kanban_tasks_one_card_per_conversation", unique: true, where: "(conversation_id IS NOT NULL)"
+    t.index ["kanban_pipeline_id"], name: "index_kanban_tasks_on_kanban_pipeline_id"
+    t.index ["kanban_stage_id", "position"], name: "index_kanban_tasks_on_kanban_stage_id_and_position"
+    t.index ["kanban_stage_id"], name: "index_kanban_tasks_on_kanban_stage_id"
   end
 
   create_table "labels", force: :cascade do |t|
@@ -1883,6 +1986,23 @@ ActiveRecord::Schema[7.1].define(version: 2026_08_26_130000) do
   add_foreign_key "internal_chat_polls", "internal_chat_messages"
   add_foreign_key "internal_chat_reactions", "internal_chat_messages"
   add_foreign_key "internal_chat_reactions", "users", on_delete: :cascade
+  add_foreign_key "kanban_automations", "accounts", on_delete: :cascade
+  add_foreign_key "kanban_automations", "kanban_pipelines", on_delete: :cascade
+  add_foreign_key "kanban_pipeline_members", "kanban_pipelines", on_delete: :cascade
+  add_foreign_key "kanban_pipeline_members", "users", on_delete: :cascade
+  add_foreign_key "kanban_pipelines", "accounts", on_delete: :cascade
+  add_foreign_key "kanban_stages", "accounts", on_delete: :cascade
+  add_foreign_key "kanban_stages", "kanban_pipelines", on_delete: :cascade
+  add_foreign_key "kanban_task_transitions", "accounts", on_delete: :cascade
+  add_foreign_key "kanban_task_transitions", "kanban_pipelines", on_delete: :cascade
+  add_foreign_key "kanban_task_transitions", "kanban_tasks", on_delete: :cascade
+  add_foreign_key "kanban_tasks", "accounts", on_delete: :cascade
+  add_foreign_key "kanban_tasks", "contacts", on_delete: :cascade
+  add_foreign_key "kanban_tasks", "conversations", on_delete: :nullify
+  add_foreign_key "kanban_tasks", "inboxes", on_delete: :nullify
+  add_foreign_key "kanban_tasks", "kanban_pipelines", on_delete: :cascade
+  add_foreign_key "kanban_tasks", "kanban_stages", on_delete: :restrict
+  add_foreign_key "kanban_tasks", "users", column: "assigned_agent_id", on_delete: :nullify
   add_foreign_key "recurring_scheduled_messages", "accounts"
   add_foreign_key "recurring_scheduled_messages", "conversations"
   add_foreign_key "recurring_scheduled_messages", "inboxes"
