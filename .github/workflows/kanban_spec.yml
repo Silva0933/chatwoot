@@ -10,16 +10,11 @@ permissions:
   contents: read
 
 on:
+  # No paths filter: it already let a schema.rb fix through without running, and
+  # the job costs a few minutes. Anything that can break these specs should run
+  # them.
   push:
     branches: [main]
-    paths:
-      - 'app/**/kanban*'
-      - 'app/**/kanban/**'
-      - 'app/listeners/kanban_listener.rb'
-      - 'lib/kanban/**'
-      - 'db/migrate/**'
-      - 'spec/**/kanban/**'
-      - '.github/workflows/kanban_spec.yml'
   pull_request:
   workflow_dispatch:
 

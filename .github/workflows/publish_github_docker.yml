@@ -11,6 +11,15 @@ on:
     types: [released]
   workflow_dispatch:
 
+# Every run's merge job writes the same :main and :latest tags, and the deploy
+# pulls them. Two runs overlapping means a deploy can read a tag mid-write: that
+# is how a push landed on a manifest that had amd64 but not yet arm64, on an
+# arm64 host. Runs queue instead of racing; they are not cancelled, because
+# cancelling one mid-deploy would leave the stack half-updated.
+concurrency:
+  group: publish-and-deploy
+  cancel-in-progress: false
+
 env:
   GITHUB_REPO: ghcr.io/silva0933/chatwoot
 
