@@ -6,6 +6,24 @@
       "UPGRADE_PROMPT": "Subscribe to fazer.ai Chatwoot Pro to access Kanban funnels, task management, and workflow automation.",
       "NON_ADMIN_MESSAGE": "The Kanban feature is not available on your current plan. Please reach out to your administrator to upgrade.",
       "UPGRADE_NOW": "Upgrade now"
+    },
+    "BOARD": {
+      "TITLE": "Kanban",
+      "SUBTITLE": "Drag a card between columns to change its stage.",
+      "EMPTY_STAGE": "No conversations here",
+      "MOVE_ERROR": "Could not move that card. Please try again."
+    },
+    "CARD": {
+      "UNKNOWN_CONTACT": "Unnamed contact",
+      "TIME_MINUTES": "{count}m",
+      "TIME_HOURS": "{count}h",
+      "TIME_DAYS": "{count}d"
+    },
+    "PRIORITY": {
+      "URGENT": "Urgent",
+      "HIGH": "High",
+      "MEDIUM": "Medium",
+      "LOW": "Low"
     }
   }
 }

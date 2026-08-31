@@ -92,6 +92,9 @@ class Account < ApplicationRecord # rubocop:disable Metrics/ClassLength
   has_many :inboxes, dependent: :destroy_async
   has_many :internal_chat_categories, class_name: 'InternalChat::Category', dependent: :destroy_async
   has_many :internal_chat_channels, class_name: 'InternalChat::Channel', dependent: :destroy_async
+  has_many :kanban_pipelines, class_name: 'Kanban::Pipeline', dependent: :destroy_async
+  has_many :kanban_stages, class_name: 'Kanban::Stage', dependent: :destroy_async
+  has_many :kanban_tasks, class_name: 'Kanban::Task', dependent: :destroy_async
   has_many :labels, dependent: :destroy_async
   has_many :line_channels, dependent: :destroy_async, class_name: '::Channel::Line'
   has_many :mentions, dependent: :destroy_async

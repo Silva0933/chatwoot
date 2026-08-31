@@ -6,6 +6,24 @@
       "UPGRADE_PROMPT": "Suscríbase a Chatwoot Pro de fazer.ai para acceder a los embudos Kanban, la gestión de tareas y la automatización de flujos de trabajo.",
       "NON_ADMIN_MESSAGE": "La función Kanban no está disponible en su plan actual. Contacte a su administrador para mejorar el plan.",
       "UPGRADE_NOW": "Mejorar plan"
+    },
+    "BOARD": {
+      "TITLE": "Kanban",
+      "SUBTITLE": "Arrastre una tarjeta entre columnas para cambiar su etapa.",
+      "EMPTY_STAGE": "No hay conversaciones aquí",
+      "MOVE_ERROR": "No se pudo mover esa tarjeta. Inténtelo de nuevo."
+    },
+    "CARD": {
+      "UNKNOWN_CONTACT": "Contacto sin nombre",
+      "TIME_MINUTES": "{count}min",
+      "TIME_HOURS": "{count}h",
+      "TIME_DAYS": "{count}d"
+    },
+    "PRIORITY": {
+      "URGENT": "Urgente",
+      "HIGH": "Alta",
+      "MEDIUM": "Media",
+      "LOW": "Baja"
     }
   }
 }

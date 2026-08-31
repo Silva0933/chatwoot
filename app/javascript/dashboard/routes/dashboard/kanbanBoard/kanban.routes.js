@@ -1,5 +1,5 @@
 import { frontendURL } from '../../../helper/URLHelper';
-import PipelineIndex from './Index.vue';
+import KanbanBoard from './Index.vue';
 
 const meta = {
   permissions: ['administrator', 'agent', 'custom_role'],
@@ -7,9 +7,9 @@ const meta = {
 
 export const routes = [
   {
-    path: frontendURL('accounts/:accountId/pipeline'),
-    component: PipelineIndex,
-    name: 'pipeline_view',
+    path: frontendURL('accounts/:accountId/kanban-board'),
+    component: KanbanBoard,
+    name: 'kanban_board',
     meta,
   },
 ];

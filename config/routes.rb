@@ -209,6 +209,15 @@ Rails.application.routes.draw do
             end
           end
 
+          namespace :kanban do
+            resources :pipelines, only: [:index, :show, :create, :update, :destroy]
+            resources :tasks, only: [:index, :show, :create, :update, :destroy] do
+              member do
+                patch :move
+              end
+            end
+          end
+
           namespace :internal_chat do
             resource :search, only: [:show], controller: 'search'
             resources :categories, only: [:index, :create, :update, :destroy]

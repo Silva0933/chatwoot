@@ -6,6 +6,24 @@
       "UPGRADE_PROMPT": "Assine o Chatwoot Pro fazer.ai para acessar funis Kanban, gerenciamento de tarefas e automação de fluxo de trabalho.",
       "NON_ADMIN_MESSAGE": "O recurso Kanban não está disponível no seu plano atual. Entre em contato com o administrador para fazer o upgrade.",
       "UPGRADE_NOW": "Fazer upgrade"
+    },
+    "BOARD": {
+      "TITLE": "Kanban",
+      "SUBTITLE": "Arraste um cartão entre as colunas para mudar o estágio.",
+      "EMPTY_STAGE": "Nenhuma conversa aqui",
+      "MOVE_ERROR": "Não foi possível mover esse cartão. Tente novamente."
+    },
+    "CARD": {
+      "UNKNOWN_CONTACT": "Contato sem nome",
+      "TIME_MINUTES": "{count}min",
+      "TIME_HOURS": "{count}h",
+      "TIME_DAYS": "{count}d"
+    },
+    "PRIORITY": {
+      "URGENT": "Urgente",
+      "HIGH": "Alta",
+      "MEDIUM": "Média",
+      "LOW": "Baixa"
     }
   }
 }
