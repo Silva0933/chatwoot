@@ -16,6 +16,7 @@ class AsyncDispatcher < BaseDispatcher
       HookListener.instance,
       InstallationWebhookListener.instance,
       InternalChatListener.instance,
+      KanbanListener.instance,
       NotificationListener.instance,
       ParticipationListener.instance,
       Conversations::UnreadCounts::Listener.instance,

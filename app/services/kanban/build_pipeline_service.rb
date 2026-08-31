@@ -9,6 +9,7 @@ class Kanban::BuildPipelineService
         position: account.kanban_pipelines.count
       )
       build_stages(pipeline)
+      build_automation(pipeline)
       pipeline
     end
   end
@@ -24,6 +25,16 @@ class Kanban::BuildPipelineService
     return template[:stages] if template.present?
 
     Kanban::Templates.find(Kanban::Templates::DEFAULT_TEMPLATE_KEY)[:stages]
+  end
+
+  # Only the account's first pipeline auto-creates cards. Without this guard every
+  # later pipeline would also claim each new conversation, so one conversation would
+  # fan out into a card on every board.
+  def build_automation(pipeline)
+    pipeline.create_automation!(
+      account_id: pipeline.account_id,
+      auto_create_on_conversation: account.kanban_pipelines.count == 1
+    )
   end
 
   def build_stages(pipeline)
