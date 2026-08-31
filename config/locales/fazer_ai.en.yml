@@ -14,6 +14,7 @@ en:
   errors:
     kanban:
       stage_not_empty: This stage still has cards. Choose another stage to move them to before deleting it.
+      unknown_stage: That stage does not exist in this pipeline.
       last_stage: A pipeline needs at least one stage. Add another one before deleting this.
     automation:
       scheduled_message:

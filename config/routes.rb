@@ -225,6 +225,13 @@ Rails.application.routes.draw do
               resources :members, only: [:index, :create, :update, :destroy]
               resource :automation, only: [:show, :update]
             end
+            # Addressed by conversation instead of card id: this is the entry point
+            # an AI agent answering a message can actually reach.
+            resources :conversation_cards, only: [:show], param: :conversation_id do
+              member do
+                post :move
+              end
+            end
             resources :tasks, only: [:index, :show, :create, :update, :destroy] do
               member do
                 patch :move
