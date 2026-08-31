@@ -13,7 +13,13 @@ class Kanban::DestroyStageService
     raise LastStageError if stage.pipeline.stages.count == 1
 
     ActiveRecord::Base.transaction do
-      relocate_tasks if stage.tasks.exists?
+      if stage.tasks.exists?
+        relocate_tasks
+        # dependent: :restrict_with_error reads the loaded association, which still
+        # holds the cards that just moved out, and would refuse the destroy.
+        stage.tasks.reset
+      end
+
       stage.destroy!
     end
   end

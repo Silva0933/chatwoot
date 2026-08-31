@@ -29,7 +29,11 @@ class Kanban::Task < ApplicationRecord
   validate :stage_belongs_to_pipeline
 
   before_validation :set_stage_entered_at, on: :create
-  before_save :reset_stage_entered_at, if: :kanban_stage_id_changed?
+  # before_update, not before_save: on create kanban_stage_id also counts as
+  # changed, so this would overwrite the value the caller passed. The backfill
+  # migration seeds cards with the conversation's own date, and every one of them
+  # was silently landing as "entered just now".
+  before_update :reset_stage_entered_at, if: :kanban_stage_id_changed?
 
   default_scope { order(:position, :id) }
 
