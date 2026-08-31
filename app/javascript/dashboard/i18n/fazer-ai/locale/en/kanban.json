@@ -16,7 +16,10 @@
       "SETTINGS": "Pipeline settings",
       "TOTAL": "Total cards",
       "FILTERED_COUNT": "Cards visible with the current filters",
-      "EMPTY": "This pipeline has no stages yet."
+      "EMPTY": "This pipeline has no stages yet.",
+      "COLUMN_VALUE": "Total deal value in this column",
+      "WIP_LIMIT": "Card limit: {limit}",
+      "WIP_EXCEEDED": "Column over its limit - this is where the funnel is stuck"
     },
     "CARD": {
       "UNKNOWN_CONTACT": "Unnamed contact",
@@ -82,7 +85,10 @@
       "ROLE": {
         "MEMBER": "Can move cards",
         "VIEWER": "View only"
-      }
+      },
+      "WIP_LIMIT": "Card limit for the column (empty = no limit)",
+      "WIP_SHORT": "limit",
+      "CARD_COUNT": "Cards in this stage"
     },
     "NEW_PIPELINE": {
       "TITLE": "New pipeline",
@@ -109,7 +115,12 @@
       "PRIORITY": "Priority",
       "DUE_DATE": "Due date",
       "ASSIGNEE": "Assignee",
-      "UNASSIGNED": "Unassigned"
+      "UNASSIGNED": "Unassigned",
+      "VALUE": "Deal value",
+      "VALUE_PLACEHOLDER": "e.g. 1500",
+      "LOSS_REASON": "Loss reason",
+      "LOSS_REASON_PLACEHOLDER": "e.g. price, went to a competitor, went quiet",
+      "LOSS_REASON_HINT": "Shows in the X-ray, grouped by reason."
     },
     "METRICS": {
       "TOGGLE": "X-ray",

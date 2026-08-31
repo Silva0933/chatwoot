@@ -16,7 +16,10 @@
       "SETTINGS": "Configurar funil",
       "TOTAL": "Total de cards",
       "FILTERED_COUNT": "Cards visíveis com os filtros atuais",
-      "EMPTY": "Este funil ainda não tem etapas."
+      "EMPTY": "Este funil ainda não tem etapas.",
+      "COLUMN_VALUE": "Soma dos negócios nesta coluna",
+      "WIP_LIMIT": "Limite de cards: {limit}",
+      "WIP_EXCEEDED": "Coluna acima do limite — é aqui que o funil está travando"
     },
     "CARD": {
       "UNKNOWN_CONTACT": "Contato sem nome",
@@ -82,7 +85,10 @@
       "ROLE": {
         "MEMBER": "Move cards",
         "VIEWER": "Só visualiza"
-      }
+      },
+      "WIP_LIMIT": "Limite de cards na coluna (vazio = sem limite)",
+      "WIP_SHORT": "limite",
+      "CARD_COUNT": "Cards nesta etapa"
     },
     "NEW_PIPELINE": {
       "TITLE": "Novo funil",
@@ -109,7 +115,12 @@
       "PRIORITY": "Prioridade",
       "DUE_DATE": "Vencimento",
       "ASSIGNEE": "Responsável",
-      "UNASSIGNED": "Sem responsável"
+      "UNASSIGNED": "Sem responsável",
+      "VALUE": "Valor do negócio",
+      "VALUE_PLACEHOLDER": "Ex.: 1500",
+      "LOSS_REASON": "Motivo da perda",
+      "LOSS_REASON_PLACEHOLDER": "Ex.: preço, foi para o concorrente, sumiu",
+      "LOSS_REASON_HINT": "Aparece no Raio-X, agrupado por motivo."
     },
     "METRICS": {
       "TOGGLE": "Raio-X",

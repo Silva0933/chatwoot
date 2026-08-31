@@ -88,9 +88,25 @@ const KIND_OPTIONS = [
 
     <span
       class="px-1.5 py-0.5 flex-shrink-0 rounded-full text-xs leading-none bg-n-solid-3 text-n-slate-11 tabular-nums"
+      :title="t('KANBAN.SETTINGS.CARD_COUNT')"
     >
       {{ taskCount }}
     </span>
+
+    <input
+      :value="stage.wip_limit"
+      type="number"
+      min="0"
+      :disabled="disabled"
+      :placeholder="t('KANBAN.SETTINGS.WIP_SHORT')"
+      :title="t('KANBAN.SETTINGS.WIP_LIMIT')"
+      class="flex-shrink-0 w-14 px-1.5 py-1 text-xs text-center bg-transparent border rounded-md border-transparent text-n-slate-11 hover:border-n-weak focus:border-n-brand focus:outline-none"
+      @change="
+        emit('update', {
+          wip_limit: $event.target.value === '' ? null : Number($event.target.value),
+        })
+      "
+    />
 
     <div class="flex items-center flex-shrink-0 gap-0.5 p-0.5 rounded-md bg-n-solid-3">
       <button

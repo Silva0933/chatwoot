@@ -4,7 +4,7 @@ import { useI18n } from 'vue-i18n';
 import Draggable from 'vuedraggable';
 import Icon from 'dashboard/components-next/icon/Icon.vue';
 import BoardCard from './BoardCard.vue';
-import { formatDuration, readableTextOn } from '../constants';
+import { formatDuration, readableTextOn, formatMoney } from '../constants';
 
 const props = defineProps({
   stage: { type: Object, required: true },
@@ -21,9 +21,22 @@ const emit = defineEmits([
   'configure',
 ]);
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 
 const headerText = computed(() => readableTextOn(props.stage.color_hex));
+
+const columnValue = computed(() =>
+  formatMoney(
+    props.tasks.reduce((sum, task) => sum + (task.value_cents || 0), 0),
+    locale.value
+  )
+);
+
+// The WIP limit is the rule the method is named after: a column over its limit
+// is where the funnel is actually stuck, so it says so on the column itself.
+const overWipLimit = computed(
+  () => !!props.stage.wip_limit && props.tasks.length > props.stage.wip_limit
+);
 
 // The count pill and the two buttons sit on the stage's own colour, so they are
 // tinted from the header's text colour rather than from a fixed palette.
@@ -65,9 +78,19 @@ const onChange = event => {
       <span
         class="px-1.5 py-0.5 rounded-md text-xs font-medium leading-none tabular-nums"
         :style="{ backgroundColor: onHeaderSoft }"
+        :title="
+          stage.wip_limit ? t('KANBAN.BOARD.WIP_LIMIT', { limit: stage.wip_limit }) : ''
+        "
       >
-        {{ tasks.length }}
+        {{ tasks.length }}<template v-if="stage.wip_limit">/{{ stage.wip_limit }}</template>
       </span>
+
+      <Icon
+        v-if="overWipLimit"
+        icon="i-lucide-triangle-alert"
+        class="flex-shrink-0 size-3.5"
+        :title="t('KANBAN.BOARD.WIP_EXCEEDED')"
+      />
 
       <template v-if="canEdit">
         <button
@@ -88,6 +111,14 @@ const onChange = event => {
         </button>
       </template>
     </header>
+
+    <div
+      v-if="columnValue"
+      class="px-3 py-1 text-[11px] font-medium text-right border-b border-n-weak text-n-teal-11 bg-n-solid-2 tabular-nums"
+      :title="t('KANBAN.BOARD.COLUMN_VALUE')"
+    >
+      {{ columnValue }}
+    </div>
 
     <div
       v-if="metrics"

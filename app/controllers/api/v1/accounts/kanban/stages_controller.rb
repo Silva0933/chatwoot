@@ -58,6 +58,6 @@ class Api::V1::Accounts::Kanban::StagesController < Api::V1::Accounts::BaseContr
   end
 
   def permitted_params
-    params.require(:stage).permit(:name, :color_hex, :is_won_stage, :is_lost_stage, :position)
+    params.require(:stage).permit(:name, :color_hex, :is_won_stage, :is_lost_stage, :position, :wip_limit)
   end
 end

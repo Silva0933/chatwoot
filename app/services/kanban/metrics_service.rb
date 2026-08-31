@@ -39,6 +39,7 @@ class Kanban::MetricsService
       is_won_stage: stage.is_won_stage,
       is_lost_stage: stage.is_lost_stage,
       card_count: current.length,
+      value_cents: current.sum(&:value_cents),
       entered_count: transitions.count { |transition| transition.to_stage_id == stage.id },
       # Cards that left this stage for the next one in the funnel, over every card
       # that left it at all. A stage people escape sideways from is the bottleneck.
@@ -68,6 +69,15 @@ class Kanban::MetricsService
     (samples.sum / samples.length.to_f).round
   end
 
+  def loss_reason_tally(lost_stage)
+    return {} if lost_stage.blank?
+
+    open_tasks
+      .select { |task| task.kanban_stage_id == lost_stage.id && task.loss_reason.present? }
+      .group_by(&:loss_reason)
+      .transform_values(&:count)
+  end
+
   def totals
     won_stage = pipeline.won_stage
     lost_stage = pipeline.lost_stage
@@ -75,11 +85,20 @@ class Kanban::MetricsService
     lost = lost_stage ? open_tasks.count { |task| task.kanban_stage_id == lost_stage.id } : 0
     closed = won + lost
 
+    won_tasks = won_stage ? open_tasks.select { |task| task.kanban_stage_id == won_stage.id } : []
+
     {
       card_count: open_tasks.length,
       won_count: won,
       lost_count: lost,
-      win_rate: closed.zero? ? nil : (won.to_f / closed * 100).round(1)
+      win_rate: closed.zero? ? nil : (won.to_f / closed * 100).round(1),
+      # The whole board and the won column separately: one is the pipeline still
+      # in play, the other is what it actually produced.
+      value_cents: open_tasks.sum(&:value_cents),
+      won_value_cents: won_tasks.sum(&:value_cents),
+      # What a closed funnel is asked for later, and the reason the column alone
+      # cannot answer: why the lost ones were lost.
+      loss_reasons: loss_reason_tally(lost_stage)
     }
   end
 end

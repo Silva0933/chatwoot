@@ -16,7 +16,10 @@
       "SETTINGS": "Configurar embudo",
       "TOTAL": "Total de tarjetas",
       "FILTERED_COUNT": "Tarjetas visibles con los filtros actuales",
-      "EMPTY": "Este embudo aún no tiene etapas."
+      "EMPTY": "Este embudo aún no tiene etapas.",
+      "COLUMN_VALUE": "Suma de los negocios en esta columna",
+      "WIP_LIMIT": "Límite de tarjetas: {limit}",
+      "WIP_EXCEEDED": "Columna por encima del límite: aquí es donde el embudo se traba"
     },
     "CARD": {
       "UNKNOWN_CONTACT": "Contacto sin nombre",
@@ -82,7 +85,10 @@
       "ROLE": {
         "MEMBER": "Mueve tarjetas",
         "VIEWER": "Solo ve"
-      }
+      },
+      "WIP_LIMIT": "Límite de tarjetas en la columna (vacío = sin límite)",
+      "WIP_SHORT": "límite",
+      "CARD_COUNT": "Tarjetas en esta etapa"
     },
     "NEW_PIPELINE": {
       "TITLE": "Nuevo embudo",
@@ -109,7 +115,12 @@
       "PRIORITY": "Prioridad",
       "DUE_DATE": "Vencimiento",
       "ASSIGNEE": "Responsable",
-      "UNASSIGNED": "Sin responsable"
+      "UNASSIGNED": "Sin responsable",
+      "VALUE": "Valor del negocio",
+      "VALUE_PLACEHOLDER": "Ej.: 1500",
+      "LOSS_REASON": "Motivo de la pérdida",
+      "LOSS_REASON_PLACEHOLDER": "Ej.: precio, se fue a la competencia, dejó de responder",
+      "LOSS_REASON_HINT": "Aparece en Rayos X, agrupado por motivo."
     },
     "METRICS": {
       "TOGGLE": "Rayos X",

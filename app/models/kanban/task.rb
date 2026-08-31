@@ -59,6 +59,7 @@ class Kanban::Task < ApplicationRecord
       title: title,
       priority: priority,
       due_date: due_date,
+      value_cents: value_cents,
       stage_entered_at: stage_entered_at,
       position: position
     }
@@ -83,6 +84,8 @@ class Kanban::Task < ApplicationRecord
       title: title,
       priority: priority,
       due_date: due_date,
+      value_cents: value_cents,
+      loss_reason: loss_reason,
       stage_entered_at: stage_entered_at,
       created_at: created_at
     }

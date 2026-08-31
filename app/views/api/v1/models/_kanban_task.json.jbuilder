@@ -10,6 +10,8 @@ json.due_date resource.due_date
 json.stage_entered_at resource.stage_entered_at
 json.position resource.position
 json.metadata resource.metadata
+json.value_cents resource.value_cents
+json.loss_reason resource.loss_reason
 
 json.contact do
   json.partial! 'api/v1/models/contact', formats: [:json], resource: resource.contact

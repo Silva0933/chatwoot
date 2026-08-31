@@ -26,6 +26,8 @@ const dueDate = ref('');
 const assignedAgentId = ref(null);
 const contactId = ref(null);
 const contactOptions = ref([]);
+const dealValue = ref('');
+const lossReason = ref('');
 
 const agents = useMapGetter('agents/getVerifiedAgents');
 
@@ -48,6 +50,10 @@ const agentOptions = computed(() => [
   ...agents.value.map(agent => ({ value: agent.id, label: agent.name })),
 ]);
 
+const isLostStage = computed(
+  () => stages.value.find(s => s.id === stageId.value)?.is_lost_stage || false
+);
+
 const canSubmit = computed(
   () => title.value.trim() && stageId.value && (isEditing.value || contactId.value)
 );
@@ -63,6 +69,8 @@ const open = (record = null, defaultStageId = null) => {
   dueDate.value = toDateInput(record?.due_date);
   assignedAgentId.value = record?.assigned_agent?.id || '';
   contactId.value = record?.contact_id || null;
+  dealValue.value = record?.value_cents ? String(record.value_cents / 100) : '';
+  lossReason.value = record?.loss_reason || '';
   contactOptions.value = record?.contact
     ? [{ value: record.contact.id, label: record.contact.name }]
     : [];
@@ -84,6 +92,10 @@ const payload = () => ({
   priority: priority.value,
   due_date: dueDate.value || null,
   assigned_agent_id: assignedAgentId.value || null,
+  // Cents on the wire: a BRL amount in a float loses money once the reports
+  // start summing it.
+  value_cents: Math.round(Number(dealValue.value.replace(',', '.') || 0) * 100),
+  loss_reason: isLostStage.value ? lossReason.value.trim() || null : null,
 });
 
 const onConfirm = async () => {
@@ -209,6 +221,19 @@ defineExpose({ open });
 
         <label class="flex flex-col gap-1">
           <span class="text-sm font-medium text-n-slate-12">
+            {{ t('KANBAN.TASK.VALUE') }}
+          </span>
+          <input
+            v-model="dealValue"
+            type="text"
+            inputmode="decimal"
+            :placeholder="t('KANBAN.TASK.VALUE_PLACEHOLDER')"
+            class="w-full h-9 px-2.5 text-sm rounded-lg border border-n-weak bg-n-solid-2 text-n-slate-12 focus:border-n-brand focus:outline-none transition-colors"
+          />
+        </label>
+
+        <label class="flex flex-col gap-1">
+          <span class="text-sm font-medium text-n-slate-12">
             {{ t('KANBAN.TASK.ASSIGNEE') }}
           </span>
           <select
@@ -221,6 +246,21 @@ defineExpose({ open });
           </select>
         </label>
       </div>
+
+      <label v-if="isLostStage" class="flex flex-col gap-1">
+        <span class="text-sm font-medium text-n-slate-12">
+          {{ t('KANBAN.TASK.LOSS_REASON') }}
+        </span>
+        <input
+          v-model="lossReason"
+          type="text"
+          :placeholder="t('KANBAN.TASK.LOSS_REASON_PLACEHOLDER')"
+          class="w-full h-9 px-2.5 text-sm rounded-lg border border-n-weak bg-n-solid-2 text-n-slate-12 focus:border-n-brand focus:outline-none transition-colors"
+        />
+        <span class="text-xs text-n-slate-10">
+          {{ t('KANBAN.TASK.LOSS_REASON_HINT') }}
+        </span>
+      </label>
 
       <button
         v-if="isEditing"

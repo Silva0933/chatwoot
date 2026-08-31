@@ -12,6 +12,7 @@ import {
   SLA_STATE,
   slaStateFor,
   formatDueDate,
+  formatMoney,
 } from '../constants';
 
 const props = defineProps({
@@ -54,6 +55,10 @@ const dueClass = computed(() => {
   if (slaState.value === SLA_STATE.DUE_TODAY) return 'text-n-amber-11';
   return 'text-n-slate-10';
 });
+
+const dealValue = computed(() =>
+  formatMoney(props.task.value_cents, locale.value)
+);
 
 const dueLabel = computed(() =>
   formatDueDate(props.task.due_date, t, locale.value)
@@ -125,15 +130,23 @@ const timeInStage = computed(() => {
       </span>
     </div>
 
-    <span
-      class="inline-flex items-center self-start gap-1.5 px-2 py-0.5 rounded-md bg-n-solid-3 text-[11px] leading-none text-n-slate-11"
-    >
+    <div class="flex items-center justify-between gap-2">
       <span
-        class="rounded-full size-1.5"
-        :style="{ backgroundColor: channel.dot }"
-      />
-      {{ channel.label }}
-    </span>
+        class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-n-solid-3 text-[11px] leading-none text-n-slate-11"
+      >
+        <span
+          class="rounded-full size-1.5"
+          :style="{ backgroundColor: channel.dot }"
+        />
+        {{ channel.label }}
+      </span>
+      <span
+        v-if="dealValue"
+        class="text-[11px] font-medium leading-none tabular-nums text-n-teal-11"
+      >
+        {{ dealValue }}
+      </span>
+    </div>
 
     <div class="flex items-center justify-between gap-2 pt-0.5">
       <Icon

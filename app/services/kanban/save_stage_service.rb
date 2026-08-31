@@ -22,7 +22,7 @@ class Kanban::SaveStageService
   end
 
   def attributes
-    params.slice(:name, :color_hex, :is_won_stage, :is_lost_stage, :position).to_h.symbolize_keys
+    params.slice(:name, :color_hex, :is_won_stage, :is_lost_stage, :position, :wip_limit).to_h.symbolize_keys
   end
 
   # Postgres enforces "one won stage and one lost stage per pipeline" with partial

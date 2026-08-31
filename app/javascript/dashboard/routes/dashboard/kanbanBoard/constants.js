@@ -172,3 +172,14 @@ export const sortTasks = (tasks, sortBy) => {
 
   return sorted.sort((a, b) => a.position - b.position);
 };
+
+// Values travel as cents so the API never rounds money; the board is the only
+// place that turns them back into currency.
+export const formatMoney = (cents, locale) => {
+  if (!cents) return null;
+  return (cents / 100).toLocaleString(locale || 'pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+    maximumFractionDigits: 0,
+  });
+};
