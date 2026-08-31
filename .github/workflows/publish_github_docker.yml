@@ -139,3 +139,61 @@ jobs:
           REPO="ghcr.io/silva0933/chatwoot"
           docker buildx imagetools inspect ${REPO}:${SANITIZED_REF}
           docker buildx imagetools inspect ${REPO}:latest
+  # Closes the loop: a push to main builds the image and rolls it out, so no one
+  # has to click Run workflow and then poke Coolify by hand.
+  deploy:
+    runs-on: ubuntu-latest
+    needs:
+      - merge
+    steps:
+      - name: Roll out to Coolify and wait for the app to answer
+        env:
+          COOLIFY_TOKEN: ${{ secrets.COOLIFY_TOKEN }}
+          COOLIFY_URL: https://coolify.secretariaai.eu.cc
+          SERVICE_UUID: khlcpsdw8b2rut7ocwlplut6
+          HEALTH_URL: https://chatwoot.secretariaai.eu.cc/api
+        run: |
+          set -euo pipefail
+
+          if [ -z "${COOLIFY_TOKEN}" ]; then
+            echo "COOLIFY_TOKEN secret is not set; the image was published but nothing was deployed." >&2
+            exit 1
+          fi
+
+          restart() {
+            curl -fsS -H "Authorization: Bearer ${COOLIFY_TOKEN}" -H "Accept: application/json"               "${COOLIFY_URL}/api/v1/services/${SERVICE_UUID}/restart?latest=true"
+            echo
+          }
+
+          # The app reports its own readiness, which is what we actually care about:
+          # Coolify queues the restart and returns immediately.
+          wait_for_health() {
+            for _ in $(seq 1 40); do
+              body=$(curl -fsS --max-time 10 "${HEALTH_URL}" || true)
+              case "${body}" in
+                *'"queue_services":"ok"'*'"data_services":"ok"'*) echo "healthy: ${body}"; return 0 ;;
+              esac
+              sleep 15
+            done
+            return 1
+          }
+
+          echo "Requesting redeploy..."
+          restart
+
+          if wait_for_health; then
+            exit 0
+          fi
+
+          # A redeploy here intermittently dies on a transient containerd error
+          # ("lease does not exist") and leaves the stack with no containers at all.
+          # A second restart has recovered it every time, so try once before failing.
+          echo "App did not come back; retrying the restart once." >&2
+          restart
+
+          if wait_for_health; then
+            exit 0
+          fi
+
+          echo "App still unreachable after two restarts; check Coolify." >&2
+          exit 1
