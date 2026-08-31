@@ -38,6 +38,13 @@ const priority = computed(
   () => PRIORITY_GLYPHS[props.task.priority] || PRIORITY_GLYPHS.medium
 );
 
+// Read through the same fallback as the glyph. Calling toUpperCase on the raw
+// field in the template would throw on a card without one, and a TypeError in a
+// child template takes the whole board down with it.
+const priorityLabel = computed(() =>
+  t(`KANBAN.PRIORITY.${(props.task.priority || 'medium').toUpperCase()}`)
+);
+
 const slaState = computed(() => slaStateFor(props.task.due_date));
 
 // Only a due date that is close or past earns colour. Painting every date amber
@@ -133,7 +140,7 @@ const timeInStage = computed(() => {
         :icon="priority.icon"
         class="flex-shrink-0 size-4"
         :class="priority.class"
-        :title="t(`KANBAN.PRIORITY.${task.priority.toUpperCase()}`)"
+        :title="priorityLabel"
       />
 
       <div class="flex items-center gap-2.5 text-[11px] leading-none">
