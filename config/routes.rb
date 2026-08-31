@@ -214,6 +214,9 @@ Rails.application.routes.draw do
               collection do
                 get :templates
               end
+              member do
+                get :metrics
+              end
               resources :stages, only: [:create, :update, :destroy] do
                 collection do
                   post :reorder

@@ -30,6 +30,7 @@ export const state = {
     isSavingSettings: false,
   },
   templates: [],
+  metrics: null,
 };
 
 export const getters = {
@@ -57,6 +58,11 @@ export const getters = {
   getTemplates($state) {
     return $state.templates;
   },
+  getMetrics($state) {
+    return $state.metrics;
+  },
+  getStageMetrics: $state => stageId =>
+    $state.metrics?.stages?.find(stage => stage.id === stageId) || null,
   getTaskCountByStage: $state => {
     return $state.records.reduce((counts, task) => {
       counts[task.stage_id] = (counts[task.stage_id] || 0) + 1;
@@ -138,6 +144,12 @@ export const actions = {
     return data.payload;
   },
 
+  fetchMetrics: async ({ commit }, { pipelineId }) => {
+    const { data } = await KanbanPipelines.metrics(pipelineId);
+    commit(types.SET_KANBAN_METRICS, data);
+    return data;
+  },
+
   updatePipeline: async ({ commit }, { id, ...payload }) => {
     const { data } = await KanbanPipelines.update(id, { pipeline: payload });
     commit(types.EDIT_KANBAN_PIPELINE, data);
@@ -187,6 +199,33 @@ export const actions = {
     );
   },
 
+  // Broadcasts carry push_event_data, which has none of the nested contact, agent
+  // or channel the card renders, so the canonical record is fetched instead of
+  // merged. A board sees a handful of these a minute, so one request each is fine.
+  syncTaskFromCable: async (
+    { commit, state: $state, rootGetters },
+    { task, performer }
+  ) => {
+    if (!task || task.pipeline_id !== $state.activePipelineId) return;
+    if (performer?.id === rootGetters.getCurrentUserID) return;
+
+    const { data } = await KanbanTasks.show(task.id);
+    const exists = $state.records.some(record => record.id === data.id);
+    commit(exists ? types.EDIT_KANBAN_TASK : types.ADD_KANBAN_TASK, data);
+  },
+
+  removeTaskFromCable: ({ commit, state: $state }, { task }) => {
+    if (!task || task.pipeline_id !== $state.activePipelineId) return;
+
+    commit(types.DELETE_KANBAN_TASK, task.id);
+  },
+
+  createTask: async ({ commit }, payload) => {
+    const { data } = await KanbanTasks.create({ task: payload });
+    commit(types.ADD_KANBAN_TASK, data);
+    return data;
+  },
+
   updateTask: async ({ commit }, { id, ...payload }) => {
     const { data } = await KanbanTasks.update(id, { task: payload });
     commit(types.EDIT_KANBAN_TASK, data);
@@ -220,6 +259,9 @@ export const mutations = {
   },
   [types.SET_KANBAN_TEMPLATES]($state, data) {
     $state.templates = data;
+  },
+  [types.SET_KANBAN_METRICS]($state, data) {
+    $state.metrics = data;
   },
   [types.SET_KANBAN_ACTIVE_PIPELINE]($state, pipelineId) {
     $state.activePipelineId = pipelineId;

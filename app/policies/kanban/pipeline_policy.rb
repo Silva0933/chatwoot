@@ -7,6 +7,10 @@ class Kanban::PipelinePolicy < ApplicationPolicy
     @account_user.administrator? || @account_user.agent?
   end
 
+  def metrics?
+    show?
+  end
+
   def templates?
     @account_user.administrator?
   end

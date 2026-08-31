@@ -12,6 +12,12 @@ class Kanban::Task < ApplicationRecord
              class_name: 'Kanban::Stage',
              foreign_key: :kanban_stage_id,
              inverse_of: :tasks
+  has_many :transitions,
+           class_name: 'Kanban::TaskTransition',
+           foreign_key: :kanban_task_id,
+           dependent: :delete_all,
+           inverse_of: :task
+
   belongs_to :contact
   belongs_to :conversation, optional: true
   belongs_to :assigned_agent, class_name: 'User', optional: true
@@ -54,6 +60,29 @@ class Kanban::Task < ApplicationRecord
     }
   end
 
+  # The payload external automations receive. It carries the ids an orchestrator
+  # needs to act on the card (n8n replying on the conversation, an ERP looking the
+  # contact up) rather than the board's own display fields.
+  def webhook_data
+    {
+      id: id,
+      account_id: account_id,
+      pipeline_id: kanban_pipeline_id,
+      pipeline_name: pipeline.name,
+      stage_id: kanban_stage_id,
+      stage_name: stage.name,
+      conversation_id: conversation_id,
+      contact_id: contact_id,
+      contact_name: contact&.name,
+      assigned_agent_id: assigned_agent_id,
+      inbox_id: inbox_id,
+      title: title,
+      priority: priority,
+      due_date: due_date,
+      stage_entered_at: stage_entered_at,
+      created_at: created_at
+    }
+  end
   private
 
   def set_stage_entered_at

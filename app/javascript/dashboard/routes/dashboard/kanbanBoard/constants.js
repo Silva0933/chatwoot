@@ -61,3 +61,16 @@ export const AUTOMATION_FLAGS = [
     hintKey: 'KANBAN.SETTINGS.AUTOMATION.WIN_ON_RESOLVE.HINT',
   },
 ];
+
+// Averages come back in seconds; a column header has room for "3d", not "268412s".
+export const formatDuration = (seconds, t) => {
+  if (seconds === null || seconds === undefined) return '—';
+
+  const minutes = Math.round(seconds / 60);
+  if (minutes < 60) return t('KANBAN.CARD.TIME_MINUTES', { count: minutes });
+
+  const hours = Math.round(minutes / 60);
+  if (hours < 24) return t('KANBAN.CARD.TIME_HOURS', { count: hours });
+
+  return t('KANBAN.CARD.TIME_DAYS', { count: Math.round(hours / 24) });
+};

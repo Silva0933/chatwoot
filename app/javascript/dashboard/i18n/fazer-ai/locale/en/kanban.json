@@ -76,6 +76,37 @@
       "TEMPLATE_LABEL": "Template",
       "CONFIRM": "Create pipeline",
       "CREATE_ERROR": "Could not create the pipeline."
+    },
+    "TASK": {
+      "NEW_TITLE": "New card",
+      "EDIT_TITLE": "Edit card",
+      "SAVE": "Save",
+      "SAVE_ERROR": "Could not save the card.",
+      "DELETE": "Delete card",
+      "DELETE_ERROR": "Could not delete the card.",
+      "CONTACT": "Contact",
+      "CONTACT_PLACEHOLDER": "Pick a contact",
+      "CONTACT_SEARCH": "Search by name, email or phone",
+      "CONTACT_EMPTY": "No contacts found",
+      "TITLE_LABEL": "Title",
+      "STAGE": "Stage",
+      "PRIORITY": "Priority",
+      "DUE_DATE": "Due date",
+      "ASSIGNEE": "Assignee",
+      "UNASSIGNED": "Unassigned"
+    },
+    "METRICS": {
+      "TOGGLE": "X-ray",
+      "ERROR": "Could not load the metrics.",
+      "AVERAGE_TIME": "Average time in stage",
+      "ENTERED": "Cards that entered in the last 30 days",
+      "PASSAGE_RATE": "Moved on to the next stage",
+      "SUMMARY": "{total} cards · {won} won · {lost} lost · {rate}% conversion"
+    },
+    "SIDEBAR": {
+      "TITLE": "Pipeline",
+      "NO_CARD": "This conversation is not in any pipeline.",
+      "MOVE_ERROR": "Could not change the stage."
     }
   }
 }

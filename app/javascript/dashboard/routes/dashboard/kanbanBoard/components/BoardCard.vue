@@ -16,7 +16,7 @@ const props = defineProps({
   stageColor: { type: String, default: '#4A86E8' },
 });
 
-defineEmits(['open']);
+defineEmits(['open', 'edit']);
 
 const { t } = useI18n();
 
@@ -65,6 +65,14 @@ const timeInStage = computed(() => {
         :size="18"
         rounded-full
       />
+      <button
+        type="button"
+        class="flex-shrink-0 p-0.5 rounded text-n-slate-10 hover:text-n-slate-12 hover:bg-n-solid-3"
+        :aria-label="t('KANBAN.TASK.EDIT_TITLE')"
+        @click.stop="$emit('edit', task)"
+      >
+        <Icon icon="i-lucide-pencil" class="size-3" />
+      </button>
     </div>
 
     <p class="m-0 text-xs leading-snug text-n-slate-11 line-clamp-2">

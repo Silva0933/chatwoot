@@ -93,4 +93,12 @@ module Events::Types
   INTERNAL_CHAT_REACTION_CREATED = 'internal_chat.reaction.created'
   INTERNAL_CHAT_REACTION_DELETED = 'internal_chat.reaction.deleted'
   INTERNAL_CHAT_POLL_VOTED = 'internal_chat.poll.voted'
+
+  # kanban events
+  KANBAN_TASK_CREATED = 'kanban.task_created'
+  KANBAN_TASK_UPDATED = 'kanban.task_updated'
+  KANBAN_TASK_MOVED = 'kanban.task_moved'
+  KANBAN_TASK_WON = 'kanban.task_won'
+  KANBAN_TASK_LOST = 'kanban.task_lost'
+  KANBAN_TASK_DELETED = 'kanban.task_deleted'
 end

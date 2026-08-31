@@ -15,6 +15,11 @@ class Kanban::Pipeline < ApplicationRecord
            foreign_key: :kanban_pipeline_id,
            dependent: :destroy,
            inverse_of: :pipeline
+  has_many :task_transitions,
+           class_name: 'Kanban::TaskTransition',
+           foreign_key: :kanban_pipeline_id,
+           dependent: :delete_all,
+           inverse_of: :pipeline
   has_many :pipeline_members,
            class_name: 'Kanban::PipelineMember',
            foreign_key: :kanban_pipeline_id,

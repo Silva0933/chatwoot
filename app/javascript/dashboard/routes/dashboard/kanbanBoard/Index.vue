@@ -12,6 +12,7 @@ import BoardColumn from './components/BoardColumn.vue';
 import PipelineSwitcher from './components/PipelineSwitcher.vue';
 import PipelineSettings from './components/PipelineSettings.vue';
 import NewPipelineDialog from './components/NewPipelineDialog.vue';
+import TaskDialog from './components/TaskDialog.vue';
 
 const store = useStore();
 const router = useRouter();
@@ -21,11 +22,15 @@ const { isAdmin } = useAdmin();
 
 const settingsRef = ref(null);
 const newPipelineRef = ref(null);
+const taskDialogRef = ref(null);
+const showMetrics = ref(false);
 
 const pipelines = useMapGetter('kanban/getPipelines');
 const activePipeline = useMapGetter('kanban/getActivePipeline');
 const tasksByStage = useMapGetter('kanban/getTasksByStage');
 const uiFlags = useMapGetter('kanban/getUIFlags');
+const metrics = useMapGetter('kanban/getMetrics');
+const stageMetrics = useMapGetter('kanban/getStageMetrics');
 
 const stages = computed(() => activePipeline.value?.stages || []);
 const isLoading = computed(
@@ -64,6 +69,26 @@ const onOpenTask = task => {
   });
 };
 
+// The X-ray is off by default: it costs an extra query over the transition log and
+// most of the time an agent just wants to see the cards.
+const onToggleMetrics = async () => {
+  showMetrics.value = !showMetrics.value;
+  if (!showMetrics.value || !activePipeline.value) return;
+
+  try {
+    await store.dispatch('kanban/fetchMetrics', {
+      pipelineId: activePipeline.value.id,
+    });
+  } catch (error) {
+    showMetrics.value = false;
+    useAlert(t('KANBAN.METRICS.ERROR'));
+  }
+};
+
+const onEditTask = task => taskDialogRef.value?.open(task);
+
+const onAddTask = stage => taskDialogRef.value?.open(null, stage.id);
+
 const onPipelineCreated = pipeline => {
   store.dispatch('kanban/fetchTasks', { pipelineId: pipeline.id });
 };
@@ -86,7 +111,17 @@ const onPipelineDeleted = () => {
         <h1 class="m-0 text-base font-medium text-n-slate-12">
           {{ activePipeline?.name || t('KANBAN.BOARD.TITLE') }}
         </h1>
-        <p class="m-0 text-xs text-n-slate-11">
+        <p v-if="showMetrics && metrics" class="m-0 text-xs text-n-slate-11">
+          {{
+            t('KANBAN.METRICS.SUMMARY', {
+              total: metrics.totals.card_count,
+              won: metrics.totals.won_count,
+              lost: metrics.totals.lost_count,
+              rate: metrics.totals.win_rate ?? '—',
+            })
+          }}
+        </p>
+        <p v-else class="m-0 text-xs text-n-slate-11">
           {{ activePipeline?.description || t('KANBAN.BOARD.SUBTITLE') }}
         </p>
       </div>
@@ -95,6 +130,14 @@ const onPipelineDeleted = () => {
           :pipelines="pipelines"
           :active-pipeline-id="activePipeline?.id"
           @select="onSelectPipeline"
+        />
+        <Button
+          variant="faded"
+          :color="showMetrics ? 'blue' : 'slate'"
+          size="sm"
+          icon="i-lucide-chart-no-axes-column"
+          :label="t('KANBAN.METRICS.TOGGLE')"
+          @click="onToggleMetrics"
         />
         <template v-if="isAdmin">
           <Button
@@ -131,10 +174,19 @@ const onPipelineDeleted = () => {
         :key="stage.id"
         :stage="stage"
         :tasks="tasksByStage(stage.id)"
+        :metrics="showMetrics ? stageMetrics(stage.id) : null"
         @drop="onDrop"
         @open-task="onOpenTask"
+        @edit-task="onEditTask"
+        @add-task="onAddTask"
       />
     </div>
+
+    <TaskDialog
+      v-if="activePipeline"
+      ref="taskDialogRef"
+      :pipeline="activePipeline"
+    />
 
     <template v-if="isAdmin">
       <PipelineSettings

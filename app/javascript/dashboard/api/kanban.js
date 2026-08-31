@@ -9,6 +9,10 @@ class KanbanPipelinesAPI extends ApiClient {
   templates() {
     return axios.get(`${this.url}/templates`);
   }
+
+  metrics(pipelineId) {
+    return axios.get(`${this.url}/${pipelineId}/metrics`);
+  }
 }
 
 // Stages and automations are nested under a pipeline, so they share the pipelines

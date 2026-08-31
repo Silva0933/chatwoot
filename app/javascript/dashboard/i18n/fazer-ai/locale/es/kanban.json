@@ -76,6 +76,37 @@
       "TEMPLATE_LABEL": "Plantilla",
       "CONFIRM": "Crear embudo",
       "CREATE_ERROR": "No se pudo crear el embudo."
+    },
+    "TASK": {
+      "NEW_TITLE": "Nueva tarjeta",
+      "EDIT_TITLE": "Editar tarjeta",
+      "SAVE": "Guardar",
+      "SAVE_ERROR": "No se pudo guardar la tarjeta.",
+      "DELETE": "Eliminar tarjeta",
+      "DELETE_ERROR": "No se pudo eliminar la tarjeta.",
+      "CONTACT": "Contacto",
+      "CONTACT_PLACEHOLDER": "Elige un contacto",
+      "CONTACT_SEARCH": "Buscar por nombre, correo o teléfono",
+      "CONTACT_EMPTY": "No se encontraron contactos",
+      "TITLE_LABEL": "Título",
+      "STAGE": "Etapa",
+      "PRIORITY": "Prioridad",
+      "DUE_DATE": "Vencimiento",
+      "ASSIGNEE": "Responsable",
+      "UNASSIGNED": "Sin responsable"
+    },
+    "METRICS": {
+      "TOGGLE": "Rayos X",
+      "ERROR": "No se pudieron cargar las métricas.",
+      "AVERAGE_TIME": "Tiempo medio en la etapa",
+      "ENTERED": "Tarjetas que entraron en los últimos 30 días",
+      "PASSAGE_RATE": "Pasaron a la siguiente etapa",
+      "SUMMARY": "{total} tarjetas · {won} ganadas · {lost} perdidas · {rate}% de conversión"
+    },
+    "SIDEBAR": {
+      "TITLE": "Embudo",
+      "NO_CARD": "Esta conversación no está en ningún embudo.",
+      "MOVE_ERROR": "No se pudo cambiar la etapa."
     }
   }
 }

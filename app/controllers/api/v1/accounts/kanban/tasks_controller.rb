@@ -1,4 +1,6 @@
 class Api::V1::Accounts::Kanban::TasksController < Api::V1::Accounts::BaseController
+  include Events::Types
+
   before_action :fetch_task, except: [:index, :create]
   before_action :check_authorization
 
@@ -8,17 +10,20 @@ class Api::V1::Accounts::Kanban::TasksController < Api::V1::Accounts::BaseContro
     @tasks = @tasks.where(kanban_pipeline_id: params[:pipeline_id]) if params[:pipeline_id].present?
     @tasks = @tasks.where(kanban_stage_id: params[:stage_id]) if params[:stage_id].present?
     @tasks = @tasks.where(assigned_agent_id: params[:assigned_agent_id]) if params[:assigned_agent_id].present?
+    @tasks = @tasks.where(conversation_id: params[:conversation_id]) if params[:conversation_id].present?
   end
 
   def show; end
 
   def create
-    @task = Current.account.kanban_tasks.create!(permitted_params.merge(stage_entered_at: Time.zone.now))
+    pipeline = Current.account.kanban_pipelines.find(permitted_params[:kanban_pipeline_id])
+    @task = Kanban::CreateTaskService.new(pipeline: pipeline, params: permitted_params).perform
     render :show
   end
 
   def update
     @task.update!(permitted_params.except(:kanban_stage_id, :position))
+    Rails.configuration.dispatcher.dispatch(KANBAN_TASK_UPDATED, Time.zone.now, task: @task)
     render :show
   end
 
@@ -33,7 +38,9 @@ class Api::V1::Accounts::Kanban::TasksController < Api::V1::Accounts::BaseContro
   end
 
   def destroy
+    payload = @task.push_event_data
     @task.destroy!
+    Rails.configuration.dispatcher.dispatch(KANBAN_TASK_DELETED, Time.zone.now, task_data: payload, account: Current.account)
     head :ok
   end
 

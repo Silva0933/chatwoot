@@ -5,7 +5,7 @@ class KanbanListener < BaseListener
     automations_for(account, conversation).each do |automation|
       next unless automation.auto_create_on_conversation?
 
-      create_task(automation.pipeline, conversation)
+      create_task(automation, conversation)
     end
   end
 
@@ -40,7 +40,48 @@ class KanbanListener < BaseListener
     end
   end
 
+  # The other direction of §4.3: reaching a terminal column closes the chat, so an
+  # agent who works the board does not have to go back and resolve by hand.
+  def kanban_task_won(event)
+    resolve_conversation(event.data[:task])
+  end
+
+  def kanban_task_lost(event)
+    resolve_conversation(event.data[:task])
+  end
+
+  def kanban_task_created(event)
+    mirror_assignee_to_conversation(event.data[:task])
+  end
+
+  def kanban_task_updated(event)
+    mirror_assignee_to_conversation(event.data[:task])
+  end
+
   private
+
+  # Compares the card and the conversation instead of reading what changed: this
+  # listener runs asynchronously, so the record arrives without dirty-tracking, and
+  # a comparison is both correct and idempotent when they already agree.
+  def mirror_assignee_to_conversation(task)
+    return unless task.pipeline.automation&.auto_assign_conversation_to_agent?
+
+    conversation = task.conversation
+    return if conversation.blank?
+    return if task.assigned_agent_id.blank?
+    return if conversation.assignee_id == task.assigned_agent_id
+
+    conversation.update(assignee_id: task.assigned_agent_id)
+  end
+
+  def resolve_conversation(task)
+    return unless task.pipeline.automation&.auto_resolve_conversation_on_finish?
+
+    conversation = task.conversation
+    return if conversation.blank? || conversation.resolved?
+
+    conversation.toggle_status
+  end
 
   def assignee_changed?(event)
     changed_attributes = event.data[:changed_attributes]
@@ -60,25 +101,30 @@ class KanbanListener < BaseListener
     account.kanban_tasks.where(conversation_id: conversation.id).includes(pipeline: :automation)
   end
 
-  def create_task(pipeline, conversation)
-    stage = pipeline.first_stage
-    return if stage.blank?
-
-    pipeline.tasks.create!(
-      account_id: pipeline.account_id,
-      kanban_stage_id: stage.id,
-      conversation_id: conversation.id,
-      contact_id: conversation.contact_id,
-      inbox_id: conversation.inbox_id,
-      assigned_agent_id: conversation.assignee_id,
-      title: task_title(conversation),
-      stage_entered_at: Time.zone.now,
-      position: stage.tasks.count
-    )
+  def create_task(automation, conversation)
+    Kanban::CreateTaskService.new(
+      pipeline: automation.pipeline,
+      params: {
+        conversation_id: conversation.id,
+        contact_id: conversation.contact_id,
+        inbox_id: conversation.inbox_id,
+        assigned_agent_id: assignee_for(automation, conversation),
+        title: task_title(conversation)
+      }
+    ).perform
   rescue ActiveRecord::RecordNotUnique
     # The unique index on (pipeline, conversation) is the source of truth here: a
     # reopened conversation must not spawn a second card.
     nil
+  end
+
+  # Round-robin only decides the owner when Chatwoot has not already assigned one;
+  # overriding a real assignment would put the card and the chat on different agents.
+  def assignee_for(automation, conversation)
+    return conversation.assignee_id if conversation.assignee_id.present?
+    return unless automation.round_robin_assignment?
+
+    Kanban::PipelineRoundRobinService.new(pipeline: automation.pipeline).next_agent_id
   end
 
   def task_title(conversation)

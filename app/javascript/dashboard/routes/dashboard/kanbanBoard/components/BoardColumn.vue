@@ -4,13 +4,15 @@ import { useI18n } from 'vue-i18n';
 import Draggable from 'vuedraggable';
 import Icon from 'dashboard/components-next/icon/Icon.vue';
 import BoardCard from './BoardCard.vue';
+import { formatDuration } from '../constants';
 
 const props = defineProps({
   stage: { type: Object, required: true },
   tasks: { type: Array, default: () => [] },
+  metrics: { type: Object, default: null },
 });
 
-const emit = defineEmits(['drop', 'open-task']);
+const emit = defineEmits(['drop', 'open-task', 'edit-task', 'add-task']);
 
 const { t } = useI18n();
 
@@ -57,6 +59,35 @@ const onChange = event => {
       >
         {{ tasks.length }}
       </span>
+      <button
+        type="button"
+        class="flex items-center justify-center rounded size-5 text-n-slate-10 hover:text-n-slate-12 hover:bg-n-solid-3"
+        :aria-label="t('KANBAN.TASK.NEW_TITLE')"
+        @click="emit('add-task', stage)"
+      >
+        <Icon icon="i-lucide-plus" class="size-3.5" />
+      </button>
+    </div>
+
+    <div
+      v-if="metrics"
+      class="flex items-center justify-between gap-2 px-3 py-1.5 border-b border-n-weak text-[11px] text-n-slate-11"
+    >
+      <span :title="t('KANBAN.METRICS.AVERAGE_TIME')">
+        <Icon icon="i-lucide-timer" class="inline size-3" />
+        {{ formatDuration(metrics.average_seconds_in_stage, t) }}
+      </span>
+      <span :title="t('KANBAN.METRICS.ENTERED')">
+        <Icon icon="i-lucide-log-in" class="inline size-3" />
+        {{ metrics.entered_count }}
+      </span>
+      <span
+        v-if="metrics.passage_rate !== null"
+        :title="t('KANBAN.METRICS.PASSAGE_RATE')"
+      >
+        <Icon icon="i-lucide-trending-up" class="inline size-3" />
+        {{ metrics.passage_rate }}%
+      </span>
     </div>
 
     <Draggable
@@ -73,6 +104,7 @@ const onChange = event => {
           :task="element"
           :stage-color="stage.color_hex"
           @open="emit('open-task', $event)"
+          @edit="emit('edit-task', $event)"
         />
       </template>
       <template #footer>

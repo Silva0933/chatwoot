@@ -1,22 +1,59 @@
 class Kanban::MoveTaskService
+  include Events::Types
+
   pattr_initialize [:task!, :target_stage!, :target_position]
 
-  # Single writer for stage_id/position: later slices hang real-time broadcasts and
-  # webhooks off this one place rather than off every controller that touches a card.
+  # Single writer for stage_id/position, which is why the real-time broadcast and
+  # the webhooks hang off here instead of off every caller that moves a card.
   def perform
+    source_stage = task.stage
+    seconds_in_stage = task.seconds_in_stage
+
     ActiveRecord::Base.transaction do
-      source_stage = task.stage
       insert_at = clamped_position(target_stage, task)
 
       shift_siblings_down(target_stage, insert_at, task)
       task.update!(kanban_stage_id: target_stage.id, position: insert_at)
-      compact_positions(source_stage) if source_stage.id != target_stage.id
+
+      if source_stage.id != target_stage.id
+        compact_positions(source_stage)
+        record_transition(source_stage, seconds_in_stage)
+      end
     end
 
     task.reload
+    dispatch_events(source_stage)
+    task
   end
 
   private
+
+  # Written inside the move transaction so the log can never claim a transition the
+  # card did not actually make.
+  def record_transition(source_stage, seconds_in_stage)
+    Kanban::TaskTransition.create!(
+      account_id: task.account_id,
+      kanban_pipeline_id: task.kanban_pipeline_id,
+      kanban_task_id: task.id,
+      from_stage_id: source_stage.id,
+      to_stage_id: target_stage.id,
+      seconds_in_previous_stage: seconds_in_stage.to_i
+    )
+  end
+
+  # Reordering inside a column is not a funnel event: only a real stage change is
+  # worth waking automations and other agents' boards.
+  def dispatch_events(source_stage)
+    return if source_stage.id == target_stage.id
+
+    dispatch(KANBAN_TASK_MOVED, from_stage_id: source_stage.id)
+    dispatch(KANBAN_TASK_WON) if target_stage.is_won_stage?
+    dispatch(KANBAN_TASK_LOST) if target_stage.is_lost_stage?
+  end
+
+  def dispatch(event_name, extra = {})
+    Rails.configuration.dispatcher.dispatch(event_name, Time.zone.now, { task: task }.merge(extra))
+  end
 
   def clamped_position(stage, moving_task)
     siblings = sibling_ids(stage, moving_task)

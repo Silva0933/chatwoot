@@ -145,6 +145,34 @@ class WebhookListener < BaseListener
     deliver_account_webhooks(payload, account)
   end
 
+  # Kanban events are account-level: a card can outlive its conversation, and a
+  # funnel is not bound to a single inbox, so there is no inbox webhook to fan out
+  # to the way conversation events have.
+  def kanban_task_created(event)
+    deliver_kanban_event(event, __method__)
+  end
+
+  def kanban_task_updated(event)
+    deliver_kanban_event(event, __method__)
+  end
+
+  def kanban_task_moved(event)
+    deliver_kanban_event(event, __method__, from_stage_id: event.data[:from_stage_id])
+  end
+
+  def kanban_task_won(event)
+    deliver_kanban_event(event, __method__)
+  end
+
+  def kanban_task_lost(event)
+    deliver_kanban_event(event, __method__)
+  end
+
+  def kanban_task_deleted(event)
+    payload = event.data[:task_data].merge(event: __method__.to_s)
+    deliver_account_webhooks(payload, event.data[:account])
+  end
+
   private
 
   def handle_typing_status(event_name, event)
@@ -183,6 +211,12 @@ class WebhookListener < BaseListener
       created_at: channel.created_at,
       updated_at: channel.updated_at
     }
+  end
+
+  def deliver_kanban_event(event, event_name, extra = {})
+    task = event.data[:task]
+    payload = task.webhook_data.merge(extra).merge(event: event_name.to_s)
+    deliver_account_webhooks(payload, task.account)
   end
 
   def deliver_account_webhooks(payload, account)

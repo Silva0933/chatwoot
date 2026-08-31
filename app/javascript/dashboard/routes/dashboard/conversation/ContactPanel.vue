@@ -20,6 +20,7 @@ import GroupContactInfo from './contact/GroupContactInfo.vue';
 import ContactNotes from './contact/ContactNotes.vue';
 import ScheduledMessages from './scheduledMessages/ScheduledMessages.vue';
 import ConversationInfo from './ConversationInfo.vue';
+import ConversationKanbanCard from './ConversationKanbanCard.vue';
 import CustomAttributes from './customAttributes/CustomAttributes.vue';
 import SharedFiles from './SharedFiles.vue';
 import Draggable from 'vuedraggable';
@@ -243,6 +244,18 @@ onMounted(() => {
                 :conversation-id="conversationId"
                 :inbox-id="inboxId"
               />
+            </AccordionItem>
+          </div>
+          <div v-else-if="element.name === 'kanban_card'">
+            <AccordionItem
+              :title="$t('KANBAN.SIDEBAR.TITLE')"
+              :is-open="isContactSidebarItemOpen('is_kanban_card_open')"
+              compact
+              @toggle="
+                value => toggleSidebarUIState('is_kanban_card_open', value)
+              "
+            >
+              <ConversationKanbanCard :conversation-id="conversationId" />
             </AccordionItem>
           </div>
           <div v-else-if="element.name === 'conversation_info'">

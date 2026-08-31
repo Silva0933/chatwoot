@@ -15,6 +15,11 @@ class Api::V1::Accounts::Kanban::PipelinesController < Api::V1::Accounts::BaseCo
     @templates = Kanban::Templates::TEMPLATES
   end
 
+  def metrics
+    @metrics = Kanban::MetricsService.new(pipeline: @pipeline, since: params[:since]).perform
+    render json: @metrics
+  end
+
   def create
     @pipeline = Kanban::BuildPipelineService.new(account: Current.account, params: permitted_params).perform
     render :show

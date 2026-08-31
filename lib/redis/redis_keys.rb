@@ -2,6 +2,9 @@ module Redis::RedisKeys
   ## Inbox Keys
   # Array storing the ordered ids for agent round robin assignment
   ROUND_ROBIN_AGENTS = 'ROUND_ROBIN_AGENTS:%<inbox_id>d'.freeze
+  # Same rotation, keyed per Kanban pipeline: a funnel's members are its own,
+  # so it cannot share the inbox queue.
+  KANBAN_ROUND_ROBIN_AGENTS = 'KANBAN_ROUND_ROBIN_AGENTS:%<pipeline_id>d'.freeze
   # Track recently deleted IMAP messages to prevent them from being synced again
   IMAP_DELETED_MESSAGE = 'IMAP_DELETED_MESSAGE::%<inbox_id>d::%<message_id_digest>s'.freeze
 

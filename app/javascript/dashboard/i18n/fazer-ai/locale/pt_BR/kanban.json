@@ -76,6 +76,37 @@
       "TEMPLATE_LABEL": "Modelo",
       "CONFIRM": "Criar funil",
       "CREATE_ERROR": "Não foi possível criar o funil."
+    },
+    "TASK": {
+      "NEW_TITLE": "Novo card",
+      "EDIT_TITLE": "Editar card",
+      "SAVE": "Salvar",
+      "SAVE_ERROR": "Não foi possível salvar o card.",
+      "DELETE": "Excluir card",
+      "DELETE_ERROR": "Não foi possível excluir o card.",
+      "CONTACT": "Contato",
+      "CONTACT_PLACEHOLDER": "Selecione um contato",
+      "CONTACT_SEARCH": "Buscar por nome, e-mail ou telefone",
+      "CONTACT_EMPTY": "Nenhum contato encontrado",
+      "TITLE_LABEL": "Título",
+      "STAGE": "Etapa",
+      "PRIORITY": "Prioridade",
+      "DUE_DATE": "Vencimento",
+      "ASSIGNEE": "Responsável",
+      "UNASSIGNED": "Sem responsável"
+    },
+    "METRICS": {
+      "TOGGLE": "Raio-X",
+      "ERROR": "Não foi possível carregar as métricas.",
+      "AVERAGE_TIME": "Tempo médio na etapa",
+      "ENTERED": "Cards que entraram nos últimos 30 dias",
+      "PASSAGE_RATE": "Passaram para a próxima etapa",
+      "SUMMARY": "{total} cards · {won} ganhos · {lost} perdidos · {rate}% de conversão"
+    },
+    "SIDEBAR": {
+      "TITLE": "Funil",
+      "NO_CARD": "Esta conversa não está em nenhum funil.",
+      "MOVE_ERROR": "Não foi possível mudar a etapa."
     }
   }
 }

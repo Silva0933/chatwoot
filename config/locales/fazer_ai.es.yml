@@ -14,6 +14,7 @@ es:
   errors:
     kanban:
       stage_not_empty: Esta etapa todavía tiene tarjetas. Elige otra etapa para moverlas antes de eliminarla.
+      last_stage: Un embudo necesita al menos una etapa. Crea otra antes de eliminar esta.
     automation:
       scheduled_message:
         delay_out_of_range: El retraso debe estar entre 1 minuto y 999 días

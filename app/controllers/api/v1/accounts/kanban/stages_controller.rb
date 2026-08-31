@@ -18,6 +18,8 @@ class Api::V1::Accounts::Kanban::StagesController < Api::V1::Accounts::BaseContr
     head :ok
   rescue Kanban::DestroyStageService::StageNotEmptyError
     render json: { error: I18n.t('errors.kanban.stage_not_empty') }, status: :unprocessable_entity
+  rescue Kanban::DestroyStageService::LastStageError
+    render json: { error: I18n.t('errors.kanban.last_stage') }, status: :unprocessable_entity
   end
 
   def reorder

@@ -316,6 +316,25 @@ class ActionCableListener < BaseListener # rubocop:disable Metrics/ClassLength
     broadcast_conversation_pin(event, CONVERSATION_UNPINNED)
   end
 
+  # The board is a shared workspace: every agent looking at it has to see a card
+  # move the moment someone else drags it, not on the next refresh.
+  def kanban_task_created(event)
+    broadcast_kanban_task(event.data[:task], KANBAN_TASK_CREATED)
+  end
+
+  def kanban_task_updated(event)
+    broadcast_kanban_task(event.data[:task], KANBAN_TASK_UPDATED)
+  end
+
+  def kanban_task_moved(event)
+    broadcast_kanban_task(event.data[:task], KANBAN_TASK_MOVED, from_stage_id: event.data[:from_stage_id])
+  end
+
+  def kanban_task_deleted(event)
+    account = event.data[:account]
+    broadcast(account, user_tokens(account, account.agents), KANBAN_TASK_DELETED, { task: event.data[:task_data] })
+  end
+
   private
 
   # Pins are personal, so the event only reaches the sessions of the agent who pinned the conversation.
@@ -370,6 +389,11 @@ class ActionCableListener < BaseListener # rubocop:disable Metrics/ClassLength
 
     tokens = user_tokens(account, conversation.inbox.members) + [conversation.contact_inbox.pubsub_token]
     current_user_token.present? ? tokens - [current_user_token] : tokens
+  end
+
+  def broadcast_kanban_task(task, event_name, extra = {})
+    account = task.account
+    broadcast(account, user_tokens(account, account.agents), event_name, { task: task.push_event_data }.merge(extra))
   end
 
   def user_tokens(account, agents)

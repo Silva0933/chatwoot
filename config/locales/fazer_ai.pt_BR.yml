@@ -14,6 +14,7 @@ pt_BR:
   errors:
     kanban:
       stage_not_empty: Esta etapa ainda tem cards. Escolha outra etapa para movê-los antes de excluir.
+      last_stage: Um funil precisa de pelo menos uma etapa. Crie outra antes de excluir esta.
     automation:
       scheduled_message:
         delay_out_of_range: O atraso deve ser entre 1 minuto e 999 dias
