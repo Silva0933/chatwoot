@@ -83,7 +83,7 @@ defineExpose({ open });
           v-model="name"
           type="text"
           :placeholder="t('KANBAN.NEW_PIPELINE.NAME_PLACEHOLDER')"
-          class="px-2.5 py-1.5 text-sm border rounded-lg border-n-weak bg-n-solid-1 text-n-slate-12 focus:border-n-brand focus:outline-none"
+          class="w-full h-9 px-2.5 text-sm rounded-lg border border-n-weak bg-n-solid-2 text-n-slate-12 focus:border-n-brand focus:outline-none transition-colors"
         />
       </label>
 
@@ -117,12 +117,18 @@ defineExpose({ open });
             </span>
           </span>
           <span class="text-xs text-n-slate-10">{{ template.description }}</span>
+          <!-- The chips carry each stage's own colour so the picker previews the
+               board the template will actually build. -->
           <span class="flex flex-wrap gap-1">
             <span
               v-for="stage in template.stages"
               :key="stage.name"
-              class="px-1.5 py-0.5 rounded text-[11px] leading-none text-n-slate-11 bg-n-solid-3"
+              class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[11px] leading-none text-n-slate-11 bg-n-solid-3"
             >
+              <span
+                class="rounded-full size-1.5"
+                :style="{ backgroundColor: stage.color_hex }"
+              />
               {{ stage.name }}
             </span>
           </span>

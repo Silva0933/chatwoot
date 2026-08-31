@@ -13,13 +13,19 @@
       "EMPTY_STAGE": "Nenhuma conversa aqui",
       "MOVE_ERROR": "Não foi possível mover esse cartão. Tente novamente.",
       "NEW_PIPELINE": "Novo funil",
-      "SETTINGS": "Configurar funil"
+      "SETTINGS": "Configurar funil",
+      "TOTAL": "Total de cards",
+      "FILTERED_COUNT": "Cards visíveis com os filtros atuais",
+      "EMPTY": "Este funil ainda não tem etapas."
     },
     "CARD": {
       "UNKNOWN_CONTACT": "Contato sem nome",
       "TIME_MINUTES": "{count}min",
       "TIME_HOURS": "{count}h",
-      "TIME_DAYS": "{count}d"
+      "TIME_DAYS": "{count}d",
+      "DUE_TODAY": "Hoje",
+      "DUE_TOMORROW": "Amanhã",
+      "DUE_YESTERDAY": "Ontem"
     },
     "PRIORITY": {
       "URGENT": "Urgente",
@@ -117,6 +123,17 @@
       "TITLE": "Funil",
       "NO_CARD": "Esta conversa não está em nenhum funil.",
       "MOVE_ERROR": "Não foi possível mudar a etapa."
+    },
+    "FILTERS": {
+      "AGENT": "Filtrar por responsável",
+      "INBOX": "Filtrar por caixa de entrada",
+      "SORT": "Ordenar",
+      "ALL_AGENTS": "Todos os agentes",
+      "ALL_INBOXES": "Todas as caixas",
+      "SORT_MANUAL": "Ordem manual",
+      "SORT_DUE": "Vencimento",
+      "SORT_PRIORITY": "Prioridade",
+      "SORT_OLDEST": "Mais tempo parado"
     }
   }
 }

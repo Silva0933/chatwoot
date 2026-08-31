@@ -163,7 +163,7 @@ defineExpose({ open });
         <input
           v-model="title"
           type="text"
-          class="px-2.5 py-1.5 text-sm border rounded-lg border-n-weak bg-n-solid-1 text-n-slate-12 focus:border-n-brand focus:outline-none"
+          class="w-full h-9 px-2.5 text-sm rounded-lg border border-n-weak bg-n-solid-2 text-n-slate-12 focus:border-n-brand focus:outline-none transition-colors"
         />
       </label>
 
@@ -174,7 +174,7 @@ defineExpose({ open });
           </span>
           <select
             v-model="stageId"
-            class="px-2.5 py-1.5 text-sm border rounded-lg border-n-weak bg-n-solid-1 text-n-slate-12"
+            class="w-full h-9 px-2.5 text-sm rounded-lg border border-n-weak bg-n-solid-2 text-n-slate-12 focus:border-n-brand focus:outline-none transition-colors"
           >
             <option v-for="o in stageOptions" :key="o.value" :value="o.value">
               {{ o.label }}
@@ -188,7 +188,7 @@ defineExpose({ open });
           </span>
           <select
             v-model="priority"
-            class="px-2.5 py-1.5 text-sm border rounded-lg border-n-weak bg-n-solid-1 text-n-slate-12"
+            class="w-full h-9 px-2.5 text-sm rounded-lg border border-n-weak bg-n-solid-2 text-n-slate-12 focus:border-n-brand focus:outline-none transition-colors"
           >
             <option v-for="o in priorityOptions" :key="o.value" :value="o.value">
               {{ o.label }}
@@ -203,7 +203,7 @@ defineExpose({ open });
           <input
             v-model="dueDate"
             type="date"
-            class="px-2.5 py-1.5 text-sm border rounded-lg border-n-weak bg-n-solid-1 text-n-slate-12 focus:border-n-brand focus:outline-none"
+            class="w-full h-9 px-2.5 text-sm rounded-lg border border-n-weak bg-n-solid-2 text-n-slate-12 focus:border-n-brand focus:outline-none transition-colors"
           />
         </label>
 
@@ -213,7 +213,7 @@ defineExpose({ open });
           </span>
           <select
             v-model="assignedAgentId"
-            class="px-2.5 py-1.5 text-sm border rounded-lg border-n-weak bg-n-solid-1 text-n-slate-12"
+            class="w-full h-9 px-2.5 text-sm rounded-lg border border-n-weak bg-n-solid-2 text-n-slate-12 focus:border-n-brand focus:outline-none transition-colors"
           >
             <option v-for="o in agentOptions" :key="o.value" :value="o.value">
               {{ o.label }}

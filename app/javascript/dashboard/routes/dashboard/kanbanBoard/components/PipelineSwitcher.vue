@@ -10,15 +10,19 @@ defineEmits(['select']);
 </script>
 
 <template>
-  <div v-if="pipelines.length > 1" class="flex items-center gap-1">
+  <div
+    v-if="pipelines.length > 1"
+    class="flex items-center gap-0.5 p-0.5 rounded-lg bg-n-solid-2 border border-n-weak"
+  >
     <button
       v-for="pipeline in pipelines"
       :key="pipeline.id"
-      class="flex items-center gap-1.5 px-2.5 py-1 text-xs rounded-md border transition-colors"
+      type="button"
+      class="flex items-center gap-1.5 px-2.5 h-7 text-xs rounded-md transition-colors"
       :class="
         pipeline.id === activePipelineId
-          ? 'bg-n-solid-3 border-n-strong text-n-slate-12'
-          : 'bg-transparent border-n-weak text-n-slate-11 hover:text-n-slate-12'
+          ? 'bg-n-alpha-1 dark:bg-n-solid-active text-n-slate-12 font-medium shadow-sm'
+          : 'text-n-slate-11 hover:text-n-slate-12'
       "
       @click="$emit('select', pipeline.id)"
     >

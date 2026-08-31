@@ -13,13 +13,19 @@
       "EMPTY_STAGE": "No hay conversaciones aquí",
       "MOVE_ERROR": "No se pudo mover esa tarjeta. Inténtelo de nuevo.",
       "NEW_PIPELINE": "Nuevo embudo",
-      "SETTINGS": "Configurar embudo"
+      "SETTINGS": "Configurar embudo",
+      "TOTAL": "Total de tarjetas",
+      "FILTERED_COUNT": "Tarjetas visibles con los filtros actuales",
+      "EMPTY": "Este embudo aún no tiene etapas."
     },
     "CARD": {
       "UNKNOWN_CONTACT": "Contacto sin nombre",
       "TIME_MINUTES": "{count}min",
       "TIME_HOURS": "{count}h",
-      "TIME_DAYS": "{count}d"
+      "TIME_DAYS": "{count}d",
+      "DUE_TODAY": "Hoy",
+      "DUE_TOMORROW": "Mañana",
+      "DUE_YESTERDAY": "Ayer"
     },
     "PRIORITY": {
       "URGENT": "Urgente",
@@ -117,6 +123,17 @@
       "TITLE": "Embudo",
       "NO_CARD": "Esta conversación no está en ningún embudo.",
       "MOVE_ERROR": "No se pudo cambiar la etapa."
+    },
+    "FILTERS": {
+      "AGENT": "Filtrar por responsable",
+      "INBOX": "Filtrar por bandeja",
+      "SORT": "Ordenar",
+      "ALL_AGENTS": "Todos los agentes",
+      "ALL_INBOXES": "Todas las bandejas",
+      "SORT_MANUAL": "Orden manual",
+      "SORT_DUE": "Vencimiento",
+      "SORT_PRIORITY": "Prioridad",
+      "SORT_OLDEST": "Más tiempo esperando"
     }
   }
 }

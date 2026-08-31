@@ -220,7 +220,7 @@ defineExpose({ open });
             v-model="newStageName"
             type="text"
             :placeholder="t('KANBAN.SETTINGS.NEW_STAGE_PLACEHOLDER')"
-            class="flex-1 px-2.5 py-1.5 text-sm border rounded-lg border-n-weak bg-n-solid-1 text-n-slate-12 focus:border-n-brand focus:outline-none"
+            class="flex-1 w-full h-9 px-2.5 text-sm rounded-lg border border-n-weak bg-n-solid-2 text-n-slate-12 focus:border-n-brand focus:outline-none transition-colors"
             @keyup.enter="onAddStage"
           />
           <Button
@@ -342,7 +342,7 @@ defineExpose({ open });
 
         <select
           :disabled="isSaving || !assignableAgents.length"
-          class="px-2.5 py-1.5 text-sm border rounded-lg border-n-weak bg-n-solid-1 text-n-slate-12"
+          class="w-full h-9 px-2.5 text-sm rounded-lg border border-n-weak bg-n-solid-2 text-n-slate-12 focus:border-n-brand focus:outline-none transition-colors"
           @change="onAddMember"
         >
           <option value="">

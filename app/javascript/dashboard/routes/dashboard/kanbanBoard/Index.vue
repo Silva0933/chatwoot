@@ -8,11 +8,14 @@ import { useAdmin } from 'dashboard/composables/useAdmin';
 import { useAlert } from 'dashboard/composables';
 import Spinner from 'dashboard/components-next/spinner/Spinner.vue';
 import Button from 'dashboard/components-next/button/Button.vue';
+import Icon from 'dashboard/components-next/icon/Icon.vue';
 import BoardColumn from './components/BoardColumn.vue';
+import BoardFilters from './components/BoardFilters.vue';
 import PipelineSwitcher from './components/PipelineSwitcher.vue';
 import PipelineSettings from './components/PipelineSettings.vue';
 import NewPipelineDialog from './components/NewPipelineDialog.vue';
 import TaskDialog from './components/TaskDialog.vue';
+import { SORT_OPTIONS, sortTasks } from './constants';
 
 const store = useStore();
 const router = useRouter();
@@ -24,10 +27,14 @@ const settingsRef = ref(null);
 const newPipelineRef = ref(null);
 const taskDialogRef = ref(null);
 const showMetrics = ref(false);
+const agentFilter = ref('');
+const inboxFilter = ref('');
+const sortBy = ref(SORT_OPTIONS[0].value);
 
 const pipelines = useMapGetter('kanban/getPipelines');
 const activePipeline = useMapGetter('kanban/getActivePipeline');
 const tasksByStage = useMapGetter('kanban/getTasksByStage');
+const allTasks = useMapGetter('kanban/getTasks');
 const uiFlags = useMapGetter('kanban/getUIFlags');
 const metrics = useMapGetter('kanban/getMetrics');
 const stageMetrics = useMapGetter('kanban/getStageMetrics');
@@ -36,6 +43,25 @@ const stages = computed(() => activePipeline.value?.stages || []);
 const isLoading = computed(
   () => uiFlags.value.isFetchingPipelines || uiFlags.value.isFetchingTasks
 );
+
+// Filtering runs over the cards already in memory. The board loads the whole
+// pipeline anyway, so a round trip per filter change would only add latency.
+const visibleTasks = stageId => {
+  const filtered = tasksByStage(stageId).filter(task => {
+    if (agentFilter.value && task.assigned_agent?.id !== agentFilter.value) {
+      return false;
+    }
+    return !(inboxFilter.value && task.inbox_id !== inboxFilter.value);
+  });
+
+  return sortTasks(filtered, sortBy.value);
+};
+
+const visibleCount = computed(
+  () => stages.value.reduce((sum, s) => sum + visibleTasks(s.id).length, 0)
+);
+
+const isFiltered = computed(() => !!(agentFilter.value || inboxFilter.value));
 
 onMounted(async () => {
   await store.dispatch('kanban/fetchPipelines');
@@ -87,7 +113,7 @@ const onToggleMetrics = async () => {
 
 const onEditTask = task => taskDialogRef.value?.open(task);
 
-const onAddTask = stage => taskDialogRef.value?.open(null, stage.id);
+const onAddTask = stage => taskDialogRef.value?.open(null, stage?.id);
 
 const onPipelineCreated = pipeline => {
   store.dispatch('kanban/fetchTasks', { pipelineId: pipeline.id });
@@ -105,32 +131,36 @@ const onPipelineDeleted = () => {
 <template>
   <section class="flex flex-col w-full h-full overflow-hidden bg-n-background">
     <header
-      class="flex flex-wrap items-center justify-between flex-shrink-0 gap-3 px-4 py-3 border-b border-n-weak"
+      class="flex flex-wrap items-center gap-2 px-4 py-2.5 flex-shrink-0 border-b border-n-weak"
     >
-      <div>
-        <h1 class="m-0 text-base font-medium text-n-slate-12">
+      <div class="flex items-center gap-2 mr-1">
+        <h1 class="m-0 text-sm font-semibold text-n-slate-12">
           {{ activePipeline?.name || t('KANBAN.BOARD.TITLE') }}
         </h1>
-        <p v-if="showMetrics && metrics" class="m-0 text-xs text-n-slate-11">
-          {{
-            t('KANBAN.METRICS.SUMMARY', {
-              total: metrics.totals.card_count,
-              won: metrics.totals.won_count,
-              lost: metrics.totals.lost_count,
-              rate: metrics.totals.win_rate ?? '—',
-            })
-          }}
-        </p>
-        <p v-else class="m-0 text-xs text-n-slate-11">
-          {{ activePipeline?.description || t('KANBAN.BOARD.SUBTITLE') }}
-        </p>
+        <span
+          class="px-1.5 py-0.5 rounded-md text-xs leading-none tabular-nums bg-n-solid-3 text-n-slate-11"
+          :title="
+            isFiltered ? t('KANBAN.BOARD.FILTERED_COUNT') : t('KANBAN.BOARD.TOTAL')
+          "
+        >
+          {{ visibleCount }}
+        </span>
       </div>
-      <div class="flex items-center gap-2">
-        <PipelineSwitcher
-          :pipelines="pipelines"
-          :active-pipeline-id="activePipeline?.id"
-          @select="onSelectPipeline"
+
+      <PipelineSwitcher
+        :pipelines="pipelines"
+        :active-pipeline-id="activePipeline?.id"
+        @select="onSelectPipeline"
+      />
+
+      <div class="flex items-center gap-2 ml-auto">
+        <BoardFilters
+          v-model:agent-id="agentFilter"
+          v-model:inbox-id="inboxFilter"
+          v-model:sort-by="sortBy"
+          :tasks="allTasks"
         />
+
         <Button
           variant="faded"
           :color="showMetrics ? 'blue' : 'slate'"
@@ -139,27 +169,52 @@ const onPipelineDeleted = () => {
           :label="t('KANBAN.METRICS.TOGGLE')"
           @click="onToggleMetrics"
         />
-        <template v-if="isAdmin">
-          <Button
-            variant="faded"
-            color="slate"
-            size="sm"
-            icon="i-lucide-plus"
-            :label="t('KANBAN.BOARD.NEW_PIPELINE')"
-            @click="newPipelineRef?.open()"
-          />
-          <Button
-            v-if="activePipeline"
-            variant="faded"
-            color="slate"
-            size="sm"
-            icon="i-lucide-settings-2"
-            :aria-label="t('KANBAN.BOARD.SETTINGS')"
-            @click="settingsRef?.open()"
-          />
-        </template>
+
+        <Button
+          v-if="isAdmin"
+          variant="faded"
+          color="slate"
+          size="sm"
+          icon="i-lucide-settings-2"
+          :aria-label="t('KANBAN.BOARD.SETTINGS')"
+          @click="settingsRef?.open()"
+        />
+
+        <Button
+          v-if="isAdmin"
+          variant="faded"
+          color="slate"
+          size="sm"
+          icon="i-lucide-git-fork"
+          :aria-label="t('KANBAN.BOARD.NEW_PIPELINE')"
+          @click="newPipelineRef?.open()"
+        />
+
+        <Button
+          variant="solid"
+          color="blue"
+          size="sm"
+          icon="i-lucide-plus"
+          :label="t('KANBAN.TASK.NEW_TITLE')"
+          :disabled="!activePipeline"
+          @click="onAddTask(null)"
+        />
       </div>
     </header>
+
+    <p
+      v-if="showMetrics && metrics"
+      class="flex-shrink-0 px-4 py-1.5 m-0 text-xs border-b border-n-weak text-n-slate-11 bg-n-solid-1"
+    >
+      {{
+        t('KANBAN.METRICS.SUMMARY', {
+          total: metrics.totals.card_count,
+          won: metrics.totals.won_count,
+          lost: metrics.totals.lost_count,
+          rate: metrics.totals.win_rate ?? '—',
+        })
+      }}
+    </p>
 
     <div
       v-if="isLoading && !stages.length"
@@ -168,17 +223,27 @@ const onPipelineDeleted = () => {
       <Spinner />
     </div>
 
+    <div
+      v-else-if="!stages.length"
+      class="flex flex-col items-center justify-center flex-1 gap-2 text-n-slate-10"
+    >
+      <Icon icon="i-lucide-columns-3" class="size-8" />
+      <p class="m-0 text-sm">{{ t('KANBAN.BOARD.EMPTY') }}</p>
+    </div>
+
     <div v-else class="flex flex-1 gap-3 p-3 overflow-x-auto">
       <BoardColumn
         v-for="stage in stages"
         :key="stage.id"
         :stage="stage"
-        :tasks="tasksByStage(stage.id)"
+        :tasks="visibleTasks(stage.id)"
         :metrics="showMetrics ? stageMetrics(stage.id) : null"
+        :can-edit="isAdmin"
         @drop="onDrop"
         @open-task="onOpenTask"
         @edit-task="onEditTask"
         @add-task="onAddTask"
+        @configure="settingsRef?.open()"
       />
     </div>
 

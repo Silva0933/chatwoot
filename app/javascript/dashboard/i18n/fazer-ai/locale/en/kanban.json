@@ -13,13 +13,19 @@
       "EMPTY_STAGE": "No conversations here",
       "MOVE_ERROR": "Could not move that card. Please try again.",
       "NEW_PIPELINE": "New pipeline",
-      "SETTINGS": "Pipeline settings"
+      "SETTINGS": "Pipeline settings",
+      "TOTAL": "Total cards",
+      "FILTERED_COUNT": "Cards visible with the current filters",
+      "EMPTY": "This pipeline has no stages yet."
     },
     "CARD": {
       "UNKNOWN_CONTACT": "Unnamed contact",
       "TIME_MINUTES": "{count}m",
       "TIME_HOURS": "{count}h",
-      "TIME_DAYS": "{count}d"
+      "TIME_DAYS": "{count}d",
+      "DUE_TODAY": "Today",
+      "DUE_TOMORROW": "Tomorrow",
+      "DUE_YESTERDAY": "Yesterday"
     },
     "PRIORITY": {
       "URGENT": "Urgent",
@@ -117,6 +123,17 @@
       "TITLE": "Pipeline",
       "NO_CARD": "This conversation is not in any pipeline.",
       "MOVE_ERROR": "Could not change the stage."
+    },
+    "FILTERS": {
+      "AGENT": "Filter by assignee",
+      "INBOX": "Filter by inbox",
+      "SORT": "Sort",
+      "ALL_AGENTS": "All agents",
+      "ALL_INBOXES": "All inboxes",
+      "SORT_MANUAL": "Manual order",
+      "SORT_DUE": "Due date",
+      "SORT_PRIORITY": "Priority",
+      "SORT_OLDEST": "Longest waiting"
     }
   }
 }
