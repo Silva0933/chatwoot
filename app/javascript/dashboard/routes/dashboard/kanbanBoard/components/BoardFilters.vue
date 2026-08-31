@@ -49,8 +49,8 @@ const menus = computed(() => [
     isActive: !!agentId.value,
     sections: [
       {
-        label: t('KANBAN.FILTERS.AGENT'),
-        options: [
+        title: t('KANBAN.FILTERS.AGENT'),
+        items: [
           {
             label: t('KANBAN.FILTERS.ALL_AGENTS'),
             value: '',
@@ -77,8 +77,8 @@ const menus = computed(() => [
     isActive: !!inboxId.value,
     sections: [
       {
-        label: t('KANBAN.FILTERS.INBOX'),
-        options: [
+        title: t('KANBAN.FILTERS.INBOX'),
+        items: [
           {
             label: t('KANBAN.FILTERS.ALL_INBOXES'),
             value: '',
@@ -102,8 +102,8 @@ const menus = computed(() => [
     isActive: sortBy.value !== SORT_OPTIONS[0].value,
     sections: [
       {
-        label: t('KANBAN.FILTERS.SORT'),
-        options: SORT_OPTIONS.map(option => ({
+        title: t('KANBAN.FILTERS.SORT'),
+        items: SORT_OPTIONS.map(option => ({
           label: t(option.labelKey),
           value: option.value,
           action: 'sort',
