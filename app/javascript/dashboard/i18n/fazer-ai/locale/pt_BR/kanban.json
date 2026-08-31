@@ -66,7 +66,13 @@
       "DELETE_PIPELINE": "Excluir este funil",
       "DELETE_PIPELINE_HINT": "Os cards do funil são excluídos junto. As conversas não são afetadas.",
       "DELETE_PIPELINE_ACTION": "Excluir funil",
-      "DELETE_PIPELINE_ERROR": "Não foi possível excluir o funil."
+      "DELETE_PIPELINE_ERROR": "Não foi possível excluir o funil.",
+      "MEMBERS_TITLE": "Membros do funil",
+      "MEMBERS_HINT_OPEN": "Sem membros, o funil fica visível para toda a equipe. Ao adicionar o primeiro, só os membros passam a ver este quadro.",
+      "MEMBERS_HINT_RESTRICTED": "Só estes agentes veem este quadro. O rodízio de leads distribui entre eles.",
+      "ADD_MEMBER": "Adicionar agente…",
+      "REMOVE_MEMBER": "Remover do funil",
+      "NO_AGENTS_LEFT": "Todos os agentes já são membros"
     },
     "NEW_PIPELINE": {
       "TITLE": "Novo funil",

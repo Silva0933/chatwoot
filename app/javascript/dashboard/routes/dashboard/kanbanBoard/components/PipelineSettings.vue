@@ -8,6 +8,7 @@ import Dialog from 'dashboard/components-next/dialog/Dialog.vue';
 import Button from 'dashboard/components-next/button/Button.vue';
 import Switch from 'dashboard/components-next/switch/Switch.vue';
 import Icon from 'dashboard/components-next/icon/Icon.vue';
+import Avatar from 'dashboard/components-next/avatar/Avatar.vue';
 import StageRow from './StageRow.vue';
 import { AUTOMATION_FLAGS } from '../constants';
 
@@ -26,6 +27,8 @@ const stagePendingDeletion = ref(null);
 const fallbackStageId = ref(null);
 
 const inboxes = useMapGetter('inboxes/getInboxes');
+const agents = useMapGetter('agents/getVerifiedAgents');
+const members = useMapGetter('kanban/getMembers');
 const uiFlags = useMapGetter('kanban/getUIFlags');
 const taskCountByStage = useMapGetter('kanban/getTaskCountByStage');
 
@@ -98,9 +101,31 @@ const onDeletePipeline = async () => {
   }
 };
 
+const memberUserIds = computed(() => members.value.map(member => member.user_id));
+
+const assignableAgents = computed(() =>
+  agents.value.filter(agent => !memberUserIds.value.includes(agent.id))
+);
+
+const onAddMember = event => {
+  const userId = Number(event.target.value);
+  event.target.value = '';
+  if (userId) dispatch('addMember', { userId });
+};
+
+const onRemoveMember = userId => dispatch('removeMember', { userId });
+
+
 const stagesExcept = stageId => stages.value.filter(s => s.id !== stageId);
 
-defineExpose({ open: () => dialogRef.value?.open() });
+// Members load on open rather than on mount: the settings dialog lives inside the
+// board, and the board should not pay for a request nobody asked for.
+const open = () => {
+  dialogRef.value?.open();
+  dispatch('fetchMembers');
+};
+
+defineExpose({ open });
 </script>
 
 <template>
@@ -259,6 +284,63 @@ defineExpose({ open: () => dialogRef.value?.open() });
             </span>
           </label>
         </div>
+      </section>
+
+      <section class="flex flex-col gap-2">
+        <div>
+          <h4 class="m-0 text-sm font-medium text-n-slate-12">
+            {{ t('KANBAN.SETTINGS.MEMBERS_TITLE') }}
+          </h4>
+          <p class="m-0 text-xs text-n-slate-10">
+            {{
+              members.length
+                ? t('KANBAN.SETTINGS.MEMBERS_HINT_RESTRICTED')
+                : t('KANBAN.SETTINGS.MEMBERS_HINT_OPEN')
+            }}
+          </p>
+        </div>
+
+        <div
+          v-for="member in members"
+          :key="member.id"
+          class="flex items-center gap-2 px-2 py-1.5 border rounded-lg border-n-weak bg-n-solid-1"
+        >
+          <Avatar
+            :name="member.user.name"
+            :src="member.user.thumbnail"
+            :size="20"
+            rounded-full
+          />
+          <span class="flex-1 min-w-0 text-sm truncate text-n-slate-12">
+            {{ member.user.name }}
+          </span>
+          <Button
+            variant="faded"
+            color="ruby"
+            size="xs"
+            icon="i-lucide-user-minus"
+            :disabled="isSaving"
+            :aria-label="t('KANBAN.SETTINGS.REMOVE_MEMBER')"
+            @click="onRemoveMember(member.user_id)"
+          />
+        </div>
+
+        <select
+          :disabled="isSaving || !assignableAgents.length"
+          class="px-2.5 py-1.5 text-sm border rounded-lg border-n-weak bg-n-solid-1 text-n-slate-12"
+          @change="onAddMember"
+        >
+          <option value="">
+            {{
+              assignableAgents.length
+                ? t('KANBAN.SETTINGS.ADD_MEMBER')
+                : t('KANBAN.SETTINGS.NO_AGENTS_LEFT')
+            }}
+          </option>
+          <option v-for="agent in assignableAgents" :key="agent.id" :value="agent.id">
+            {{ agent.name }}
+          </option>
+        </select>
       </section>
 
       <section

@@ -2,6 +2,7 @@ import types from '../mutation-types';
 import {
   KanbanPipelines,
   KanbanStages,
+  KanbanMembers,
   KanbanAutomations,
   KanbanTasks,
 } from '../../api/kanban';
@@ -31,6 +32,7 @@ export const state = {
   },
   templates: [],
   metrics: null,
+  members: [],
 };
 
 export const getters = {
@@ -60,6 +62,9 @@ export const getters = {
   },
   getMetrics($state) {
     return $state.metrics;
+  },
+  getMembers($state) {
+    return $state.members;
   },
   getStageMetrics: $state => stageId =>
     $state.metrics?.stages?.find(stage => stage.id === stageId) || null,
@@ -148,6 +153,24 @@ export const actions = {
     const { data } = await KanbanPipelines.metrics(pipelineId);
     commit(types.SET_KANBAN_METRICS, data);
     return data;
+  },
+
+  fetchMembers: async ({ commit }, { pipelineId }) => {
+    const { data } = await KanbanMembers.list(pipelineId);
+    commit(types.SET_KANBAN_MEMBERS, data.payload);
+    return data.payload;
+  },
+
+  // Membership decides who can see the funnel, so both writes refetch: the list is
+  // small and it keeps the screen from disagreeing with the access rule.
+  addMember: async ({ dispatch }, { pipelineId, userId }) => {
+    await KanbanMembers.create(pipelineId, userId);
+    await dispatch('fetchMembers', { pipelineId });
+  },
+
+  removeMember: async ({ dispatch }, { pipelineId, userId }) => {
+    await KanbanMembers.delete(pipelineId, userId);
+    await dispatch('fetchMembers', { pipelineId });
   },
 
   updatePipeline: async ({ commit }, { id, ...payload }) => {
@@ -262,6 +285,9 @@ export const mutations = {
   },
   [types.SET_KANBAN_METRICS]($state, data) {
     $state.metrics = data;
+  },
+  [types.SET_KANBAN_MEMBERS]($state, data) {
+    $state.members = data;
   },
   [types.SET_KANBAN_ACTIVE_PIPELINE]($state, pipelineId) {
     $state.activePipelineId = pipelineId;

@@ -66,7 +66,13 @@
       "DELETE_PIPELINE": "Delete this pipeline",
       "DELETE_PIPELINE_HINT": "Its cards are deleted with it. Conversations are untouched.",
       "DELETE_PIPELINE_ACTION": "Delete pipeline",
-      "DELETE_PIPELINE_ERROR": "Could not delete the pipeline."
+      "DELETE_PIPELINE_ERROR": "Could not delete the pipeline.",
+      "MEMBERS_TITLE": "Pipeline members",
+      "MEMBERS_HINT_OPEN": "With no members, the funnel is visible to the whole team. Adding the first one restricts this board to members only.",
+      "MEMBERS_HINT_RESTRICTED": "Only these agents see this board. Round-robin distributes leads among them.",
+      "ADD_MEMBER": "Add an agent…",
+      "REMOVE_MEMBER": "Remove from pipeline",
+      "NO_AGENTS_LEFT": "Every agent is already a member"
     },
     "NEW_PIPELINE": {
       "TITLE": "New pipeline",

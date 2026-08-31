@@ -66,7 +66,13 @@
       "DELETE_PIPELINE": "Eliminar este embudo",
       "DELETE_PIPELINE_HINT": "Sus tarjetas se eliminan con él. Las conversaciones no se ven afectadas.",
       "DELETE_PIPELINE_ACTION": "Eliminar embudo",
-      "DELETE_PIPELINE_ERROR": "No se pudo eliminar el embudo."
+      "DELETE_PIPELINE_ERROR": "No se pudo eliminar el embudo.",
+      "MEMBERS_TITLE": "Miembros del embudo",
+      "MEMBERS_HINT_OPEN": "Sin miembros, el embudo es visible para todo el equipo. Al añadir el primero, solo los miembros verán este tablero.",
+      "MEMBERS_HINT_RESTRICTED": "Solo estos agentes ven este tablero. El reparto rotativo distribuye entre ellos.",
+      "ADD_MEMBER": "Añadir agente…",
+      "REMOVE_MEMBER": "Quitar del embudo",
+      "NO_AGENTS_LEFT": "Todos los agentes ya son miembros"
     },
     "NEW_PIPELINE": {
       "TITLE": "Nuevo embudo",

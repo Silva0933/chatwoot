@@ -47,6 +47,28 @@ class KanbanStagesAPI extends ApiClient {
   }
 }
 
+class KanbanMembersAPI extends ApiClient {
+  constructor() {
+    super('kanban/pipelines', { accountScoped: true });
+  }
+
+  membersUrl(pipelineId) {
+    return `${this.url}/${pipelineId}/members`;
+  }
+
+  list(pipelineId) {
+    return axios.get(this.membersUrl(pipelineId));
+  }
+
+  create(pipelineId, userId) {
+    return axios.post(this.membersUrl(pipelineId), { user_id: userId });
+  }
+
+  delete(pipelineId, userId) {
+    return axios.delete(`${this.membersUrl(pipelineId)}/${userId}`);
+  }
+}
+
 class KanbanAutomationsAPI extends ApiClient {
   constructor() {
     super('kanban/pipelines', { accountScoped: true });
@@ -80,5 +102,6 @@ class KanbanTasksAPI extends ApiClient {
 
 export const KanbanPipelines = new KanbanPipelinesAPI();
 export const KanbanStages = new KanbanStagesAPI();
+export const KanbanMembers = new KanbanMembersAPI();
 export const KanbanAutomations = new KanbanAutomationsAPI();
 export const KanbanTasks = new KanbanTasksAPI();
