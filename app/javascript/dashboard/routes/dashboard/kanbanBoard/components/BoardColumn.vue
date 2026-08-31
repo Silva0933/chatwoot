@@ -52,7 +52,7 @@ const onChange = event => {
 
 <template>
   <div
-    class="flex flex-col flex-shrink-0 w-[290px] overflow-hidden border rounded-xl border-n-weak bg-n-solid-1"
+    class="flex flex-col flex-shrink-0 w-[85vw] max-w-[290px] sm:w-[290px] h-full min-h-0 overflow-hidden border rounded-xl border-n-weak bg-n-solid-1"
   >
     <header
       class="flex items-center gap-2 px-3 py-2"
@@ -116,7 +116,7 @@ const onChange = event => {
       item-key="id"
       animation="180"
       ghost-class="opacity-40"
-      class="flex flex-col flex-1 gap-2 p-2 overflow-y-auto min-h-[120px] max-h-[calc(100vh-190px)]"
+      class="flex flex-col flex-1 min-h-0 gap-2 p-2 overflow-y-auto"
       @change="onChange"
     >
       <template #item="{ element }">
