@@ -134,7 +134,7 @@ const onPipelineDeleted = () => {
 <template>
   <section class="flex flex-col w-full h-full overflow-hidden bg-n-background">
     <header
-      class="flex items-center gap-2 px-4 py-2.5 flex-shrink-0 overflow-x-auto border-b border-n-weak"
+      class="relative z-20 flex flex-wrap items-center gap-2 px-4 py-2.5 flex-shrink-0 border-b border-n-weak"
     >
       <div class="flex items-center gap-2 mr-1">
         <h1 class="m-0 text-sm font-semibold text-n-slate-12">
@@ -169,7 +169,7 @@ const onPipelineDeleted = () => {
         @click="newPipelineRef?.open()"
       />
 
-      <div class="flex items-center flex-shrink-0 gap-2 ml-auto">
+      <div class="flex flex-wrap items-center gap-2 ml-auto">
         <BoardFilters
           v-model:agent-id="agentFilter"
           v-model:inbox-id="inboxFilter"
