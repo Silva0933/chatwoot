@@ -11,7 +11,9 @@
       "TITLE": "Kanban",
       "SUBTITLE": "Arraste um cartão entre as colunas para mudar o estágio.",
       "EMPTY_STAGE": "Nenhuma conversa aqui",
-      "MOVE_ERROR": "Não foi possível mover esse cartão. Tente novamente."
+      "MOVE_ERROR": "Não foi possível mover esse cartão. Tente novamente.",
+      "NEW_PIPELINE": "Novo funil",
+      "SETTINGS": "Configurar funil"
     },
     "CARD": {
       "UNKNOWN_CONTACT": "Contato sem nome",
@@ -24,6 +26,56 @@
       "HIGH": "Alta",
       "MEDIUM": "Média",
       "LOW": "Baixa"
+    },
+    "SETTINGS": {
+      "TITLE": "Configurar {name}",
+      "DESCRIPTION": "Etapas, automações e caixas de entrada deste funil. As alterações são salvas na hora.",
+      "CLOSE": "Fechar",
+      "SAVING": "Salvando…",
+      "SAVE_ERROR": "Não foi possível salvar. Tente novamente.",
+      "STAGES_TITLE": "Etapas",
+      "STAGE_COLOR": "Cor da etapa",
+      "ADD_STAGE": "Adicionar",
+      "NEW_STAGE_PLACEHOLDER": "Nome da nova etapa",
+      "DELETE_STAGE": "Excluir etapa",
+      "DELETE_STAGE_CONFIRM": "Excluir \"{name}\"? Ela tem {count} card(s).",
+      "CONFIRM_DELETE": "Excluir",
+      "CANCEL": "Cancelar",
+      "KIND": {
+        "OPEN": "Etapa comum",
+        "WON": "Oportunidade ganha",
+        "LOST": "Oportunidade perdida"
+      },
+      "AUTOMATIONS_TITLE": "Automações",
+      "AUTOMATION": {
+        "CREATE": {
+          "LABEL": "Criar card em nova conversa",
+          "HINT": "Toda conversa nova vira um card na primeira etapa."
+        },
+        "ASSIGN_TASK": {
+          "LABEL": "Espelhar o responsável",
+          "HINT": "Quem assume a conversa no chat vira o responsável do card."
+        },
+        "WIN_ON_RESOLVE": {
+          "LABEL": "Ganhar ao resolver a conversa",
+          "HINT": "Resolver a conversa move o card para a etapa de ganho."
+        }
+      },
+      "INBOXES_TITLE": "Caixas de entrada",
+      "INBOXES_HINT": "Só estas caixas alimentam o funil. Nenhuma marcada = todas.",
+      "DELETE_PIPELINE": "Excluir este funil",
+      "DELETE_PIPELINE_HINT": "Os cards do funil são excluídos junto. As conversas não são afetadas.",
+      "DELETE_PIPELINE_ACTION": "Excluir funil",
+      "DELETE_PIPELINE_ERROR": "Não foi possível excluir o funil."
+    },
+    "NEW_PIPELINE": {
+      "TITLE": "Novo funil",
+      "DESCRIPTION": "Escolha um modelo de partida. As etapas podem ser ajustadas depois.",
+      "NAME_LABEL": "Nome do funil",
+      "NAME_PLACEHOLDER": "Ex.: Captação de Pacientes",
+      "TEMPLATE_LABEL": "Modelo",
+      "CONFIRM": "Criar funil",
+      "CREATE_ERROR": "Não foi possível criar o funil."
     }
   }
 }

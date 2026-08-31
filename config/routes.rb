@@ -210,7 +210,17 @@ Rails.application.routes.draw do
           end
 
           namespace :kanban do
-            resources :pipelines, only: [:index, :show, :create, :update, :destroy]
+            resources :pipelines, only: [:index, :show, :create, :update, :destroy] do
+              collection do
+                get :templates
+              end
+              resources :stages, only: [:create, :update, :destroy] do
+                collection do
+                  post :reorder
+                end
+              end
+              resource :automation, only: [:show, :update]
+            end
             resources :tasks, only: [:index, :show, :create, :update, :destroy] do
               member do
                 patch :move

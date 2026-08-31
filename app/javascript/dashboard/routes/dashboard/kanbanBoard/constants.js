@@ -40,3 +40,24 @@ export const slaStateFor = dueDate => {
   if (due.toDateString() === now.toDateString()) return SLA_STATE.DUE_TODAY;
   return SLA_STATE.ON_TRACK;
 };
+
+// Only the flags KanbanListener actually honours are exposed. The remaining three
+// columns exist in the table but nothing reads them yet, and a toggle that changes
+// nothing is worse than a missing one.
+export const AUTOMATION_FLAGS = [
+  {
+    key: 'auto_create_on_conversation',
+    labelKey: 'KANBAN.SETTINGS.AUTOMATION.CREATE.LABEL',
+    hintKey: 'KANBAN.SETTINGS.AUTOMATION.CREATE.HINT',
+  },
+  {
+    key: 'auto_assign_task_to_agent',
+    labelKey: 'KANBAN.SETTINGS.AUTOMATION.ASSIGN_TASK.LABEL',
+    hintKey: 'KANBAN.SETTINGS.AUTOMATION.ASSIGN_TASK.HINT',
+  },
+  {
+    key: 'auto_win_task_on_resolve',
+    labelKey: 'KANBAN.SETTINGS.AUTOMATION.WIN_ON_RESOLVE.LABEL',
+    hintKey: 'KANBAN.SETTINGS.AUTOMATION.WIN_ON_RESOLVE.HINT',
+  },
+];

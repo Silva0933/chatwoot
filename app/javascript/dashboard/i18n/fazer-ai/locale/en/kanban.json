@@ -11,7 +11,9 @@
       "TITLE": "Kanban",
       "SUBTITLE": "Drag a card between columns to change its stage.",
       "EMPTY_STAGE": "No conversations here",
-      "MOVE_ERROR": "Could not move that card. Please try again."
+      "MOVE_ERROR": "Could not move that card. Please try again.",
+      "NEW_PIPELINE": "New pipeline",
+      "SETTINGS": "Pipeline settings"
     },
     "CARD": {
       "UNKNOWN_CONTACT": "Unnamed contact",
@@ -24,6 +26,56 @@
       "HIGH": "High",
       "MEDIUM": "Medium",
       "LOW": "Low"
+    },
+    "SETTINGS": {
+      "TITLE": "Configure {name}",
+      "DESCRIPTION": "Stages, automations and inboxes for this pipeline. Changes save as you make them.",
+      "CLOSE": "Close",
+      "SAVING": "Saving…",
+      "SAVE_ERROR": "Could not save. Please try again.",
+      "STAGES_TITLE": "Stages",
+      "STAGE_COLOR": "Stage colour",
+      "ADD_STAGE": "Add",
+      "NEW_STAGE_PLACEHOLDER": "New stage name",
+      "DELETE_STAGE": "Delete stage",
+      "DELETE_STAGE_CONFIRM": "Delete \"{name}\"? It holds {count} card(s).",
+      "CONFIRM_DELETE": "Delete",
+      "CANCEL": "Cancel",
+      "KIND": {
+        "OPEN": "Regular stage",
+        "WON": "Won stage",
+        "LOST": "Lost stage"
+      },
+      "AUTOMATIONS_TITLE": "Automations",
+      "AUTOMATION": {
+        "CREATE": {
+          "LABEL": "Create a card on new conversations",
+          "HINT": "Every new conversation becomes a card in the first stage."
+        },
+        "ASSIGN_TASK": {
+          "LABEL": "Mirror the assignee",
+          "HINT": "Whoever takes the conversation becomes the card owner."
+        },
+        "WIN_ON_RESOLVE": {
+          "LABEL": "Win the card when the conversation is resolved",
+          "HINT": "Resolving the conversation moves the card to the won stage."
+        }
+      },
+      "INBOXES_TITLE": "Inboxes",
+      "INBOXES_HINT": "Only these inboxes feed the pipeline. None selected means all of them.",
+      "DELETE_PIPELINE": "Delete this pipeline",
+      "DELETE_PIPELINE_HINT": "Its cards are deleted with it. Conversations are untouched.",
+      "DELETE_PIPELINE_ACTION": "Delete pipeline",
+      "DELETE_PIPELINE_ERROR": "Could not delete the pipeline."
+    },
+    "NEW_PIPELINE": {
+      "TITLE": "New pipeline",
+      "DESCRIPTION": "Pick a starting template. Stages can be adjusted afterwards.",
+      "NAME_LABEL": "Pipeline name",
+      "NAME_PLACEHOLDER": "e.g. Patient acquisition",
+      "TEMPLATE_LABEL": "Template",
+      "CONFIRM": "Create pipeline",
+      "CREATE_ERROR": "Could not create the pipeline."
     }
   }
 }

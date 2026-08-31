@@ -12,6 +12,8 @@ es:
     messages:
       deleted: Este mensaje fue eliminado
   errors:
+    kanban:
+      stage_not_empty: Esta etapa todavía tiene tarjetas. Elige otra etapa para moverlas antes de eliminarla.
     automation:
       scheduled_message:
         delay_out_of_range: El retraso debe estar entre 1 minuto y 999 días

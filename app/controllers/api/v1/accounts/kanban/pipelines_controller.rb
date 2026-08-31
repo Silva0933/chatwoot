@@ -1,5 +1,5 @@
 class Api::V1::Accounts::Kanban::PipelinesController < Api::V1::Accounts::BaseController
-  before_action :fetch_pipeline, except: [:index, :create]
+  before_action :fetch_pipeline, except: [:index, :create, :templates]
   before_action :check_authorization
 
   def index
@@ -8,6 +8,12 @@ class Api::V1::Accounts::Kanban::PipelinesController < Api::V1::Accounts::BaseCo
   end
 
   def show; end
+
+  # The funnel templates live in Ruby so the seed and the API agree on them;
+  # serving them keeps the "new pipeline" screen from re-declaring the same list.
+  def templates
+    @templates = Kanban::Templates::TEMPLATES
+  end
 
   def create
     @pipeline = Kanban::BuildPipelineService.new(account: Current.account, params: permitted_params).perform

@@ -5,6 +5,56 @@ class KanbanPipelinesAPI extends ApiClient {
   constructor() {
     super('kanban/pipelines', { accountScoped: true });
   }
+
+  templates() {
+    return axios.get(`${this.url}/templates`);
+  }
+}
+
+// Stages and automations are nested under a pipeline, so they share the pipelines
+// base url instead of getting a resource of their own.
+class KanbanStagesAPI extends ApiClient {
+  constructor() {
+    super('kanban/pipelines', { accountScoped: true });
+  }
+
+  stagesUrl(pipelineId) {
+    return `${this.url}/${pipelineId}/stages`;
+  }
+
+  create(pipelineId, stage) {
+    return axios.post(this.stagesUrl(pipelineId), { stage });
+  }
+
+  update(pipelineId, stageId, stage) {
+    return axios.patch(`${this.stagesUrl(pipelineId)}/${stageId}`, { stage });
+  }
+
+  delete(pipelineId, stageId, { moveTasksToStageId } = {}) {
+    return axios.delete(`${this.stagesUrl(pipelineId)}/${stageId}`, {
+      params: { move_tasks_to_stage_id: moveTasksToStageId },
+    });
+  }
+
+  reorder(pipelineId, stageIds) {
+    return axios.post(`${this.stagesUrl(pipelineId)}/reorder`, {
+      stage_ids: stageIds,
+    });
+  }
+}
+
+class KanbanAutomationsAPI extends ApiClient {
+  constructor() {
+    super('kanban/pipelines', { accountScoped: true });
+  }
+
+  show(pipelineId) {
+    return axios.get(`${this.url}/${pipelineId}/automation`);
+  }
+
+  update(pipelineId, automation) {
+    return axios.patch(`${this.url}/${pipelineId}/automation`, { automation });
+  }
 }
 
 class KanbanTasksAPI extends ApiClient {
@@ -25,4 +75,6 @@ class KanbanTasksAPI extends ApiClient {
 }
 
 export const KanbanPipelines = new KanbanPipelinesAPI();
+export const KanbanStages = new KanbanStagesAPI();
+export const KanbanAutomations = new KanbanAutomationsAPI();
 export const KanbanTasks = new KanbanTasksAPI();

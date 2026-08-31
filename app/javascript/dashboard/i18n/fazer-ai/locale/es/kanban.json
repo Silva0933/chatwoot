@@ -11,7 +11,9 @@
       "TITLE": "Kanban",
       "SUBTITLE": "Arrastre una tarjeta entre columnas para cambiar su etapa.",
       "EMPTY_STAGE": "No hay conversaciones aquí",
-      "MOVE_ERROR": "No se pudo mover esa tarjeta. Inténtelo de nuevo."
+      "MOVE_ERROR": "No se pudo mover esa tarjeta. Inténtelo de nuevo.",
+      "NEW_PIPELINE": "Nuevo embudo",
+      "SETTINGS": "Configurar embudo"
     },
     "CARD": {
       "UNKNOWN_CONTACT": "Contacto sin nombre",
@@ -24,6 +26,56 @@
       "HIGH": "Alta",
       "MEDIUM": "Media",
       "LOW": "Baja"
+    },
+    "SETTINGS": {
+      "TITLE": "Configurar {name}",
+      "DESCRIPTION": "Etapas, automatizaciones y bandejas de este embudo. Los cambios se guardan al instante.",
+      "CLOSE": "Cerrar",
+      "SAVING": "Guardando…",
+      "SAVE_ERROR": "No se pudo guardar. Inténtalo de nuevo.",
+      "STAGES_TITLE": "Etapas",
+      "STAGE_COLOR": "Color de la etapa",
+      "ADD_STAGE": "Añadir",
+      "NEW_STAGE_PLACEHOLDER": "Nombre de la nueva etapa",
+      "DELETE_STAGE": "Eliminar etapa",
+      "DELETE_STAGE_CONFIRM": "¿Eliminar \"{name}\"? Tiene {count} tarjeta(s).",
+      "CONFIRM_DELETE": "Eliminar",
+      "CANCEL": "Cancelar",
+      "KIND": {
+        "OPEN": "Etapa normal",
+        "WON": "Oportunidad ganada",
+        "LOST": "Oportunidad perdida"
+      },
+      "AUTOMATIONS_TITLE": "Automatizaciones",
+      "AUTOMATION": {
+        "CREATE": {
+          "LABEL": "Crear tarjeta en conversaciones nuevas",
+          "HINT": "Cada conversación nueva se convierte en una tarjeta en la primera etapa."
+        },
+        "ASSIGN_TASK": {
+          "LABEL": "Reflejar el responsable",
+          "HINT": "Quien toma la conversación pasa a ser el responsable de la tarjeta."
+        },
+        "WIN_ON_RESOLVE": {
+          "LABEL": "Ganar al resolver la conversación",
+          "HINT": "Resolver la conversación mueve la tarjeta a la etapa de ganado."
+        }
+      },
+      "INBOXES_TITLE": "Bandejas de entrada",
+      "INBOXES_HINT": "Solo estas bandejas alimentan el embudo. Ninguna marcada = todas.",
+      "DELETE_PIPELINE": "Eliminar este embudo",
+      "DELETE_PIPELINE_HINT": "Sus tarjetas se eliminan con él. Las conversaciones no se ven afectadas.",
+      "DELETE_PIPELINE_ACTION": "Eliminar embudo",
+      "DELETE_PIPELINE_ERROR": "No se pudo eliminar el embudo."
+    },
+    "NEW_PIPELINE": {
+      "TITLE": "Nuevo embudo",
+      "DESCRIPTION": "Elige una plantilla inicial. Las etapas se pueden ajustar después.",
+      "NAME_LABEL": "Nombre del embudo",
+      "NAME_PLACEHOLDER": "Ej.: Captación de pacientes",
+      "TEMPLATE_LABEL": "Plantilla",
+      "CONFIRM": "Crear embudo",
+      "CREATE_ERROR": "No se pudo crear el embudo."
     }
   }
 }

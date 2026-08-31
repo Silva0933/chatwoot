@@ -1,18 +1,26 @@
 <script setup>
-import { computed, onMounted, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { useStore, useMapGetter } from 'dashboard/composables/store';
 import { useAccount } from 'dashboard/composables/useAccount';
+import { useAdmin } from 'dashboard/composables/useAdmin';
 import { useAlert } from 'dashboard/composables';
 import Spinner from 'dashboard/components-next/spinner/Spinner.vue';
+import Button from 'dashboard/components-next/button/Button.vue';
 import BoardColumn from './components/BoardColumn.vue';
 import PipelineSwitcher from './components/PipelineSwitcher.vue';
+import PipelineSettings from './components/PipelineSettings.vue';
+import NewPipelineDialog from './components/NewPipelineDialog.vue';
 
 const store = useStore();
 const router = useRouter();
 const { t } = useI18n();
 const { accountId } = useAccount();
+const { isAdmin } = useAdmin();
+
+const settingsRef = ref(null);
+const newPipelineRef = ref(null);
 
 const pipelines = useMapGetter('kanban/getPipelines');
 const activePipeline = useMapGetter('kanban/getActivePipeline');
@@ -55,6 +63,18 @@ const onOpenTask = task => {
     params: { accountId: accountId.value, conversation_id: task.conversation_id },
   });
 };
+
+const onPipelineCreated = pipeline => {
+  store.dispatch('kanban/fetchTasks', { pipelineId: pipeline.id });
+};
+
+// The deleted pipeline was the active one, so the store cleared the selection and
+// the getter falls back to the first remaining funnel; its cards still have to load.
+const onPipelineDeleted = () => {
+  if (activePipeline.value) {
+    store.dispatch('kanban/fetchTasks', { pipelineId: activePipeline.value.id });
+  }
+};
 </script>
 
 <template>
@@ -70,11 +90,32 @@ const onOpenTask = task => {
           {{ activePipeline?.description || t('KANBAN.BOARD.SUBTITLE') }}
         </p>
       </div>
-      <PipelineSwitcher
-        :pipelines="pipelines"
-        :active-pipeline-id="activePipeline?.id"
-        @select="onSelectPipeline"
-      />
+      <div class="flex items-center gap-2">
+        <PipelineSwitcher
+          :pipelines="pipelines"
+          :active-pipeline-id="activePipeline?.id"
+          @select="onSelectPipeline"
+        />
+        <template v-if="isAdmin">
+          <Button
+            variant="faded"
+            color="slate"
+            size="sm"
+            icon="i-lucide-plus"
+            :label="t('KANBAN.BOARD.NEW_PIPELINE')"
+            @click="newPipelineRef?.open()"
+          />
+          <Button
+            v-if="activePipeline"
+            variant="faded"
+            color="slate"
+            size="sm"
+            icon="i-lucide-settings-2"
+            :aria-label="t('KANBAN.BOARD.SETTINGS')"
+            @click="settingsRef?.open()"
+          />
+        </template>
+      </div>
     </header>
 
     <div
@@ -94,5 +135,16 @@ const onOpenTask = task => {
         @open-task="onOpenTask"
       />
     </div>
+
+    <template v-if="isAdmin">
+      <PipelineSettings
+        v-if="activePipeline"
+        ref="settingsRef"
+        :key="activePipeline.id"
+        :pipeline="activePipeline"
+        @deleted="onPipelineDeleted"
+      />
+      <NewPipelineDialog ref="newPipelineRef" @created="onPipelineCreated" />
+    </template>
   </section>
 </template>

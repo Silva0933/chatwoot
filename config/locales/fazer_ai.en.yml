@@ -12,6 +12,8 @@ en:
     messages:
       deleted: This message was deleted
   errors:
+    kanban:
+      stage_not_empty: This stage still has cards. Choose another stage to move them to before deleting it.
     automation:
       scheduled_message:
         delay_out_of_range: Delay must be between 1 minute and 999 days

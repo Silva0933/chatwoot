@@ -1,0 +1,9 @@
+json.id resource.id
+json.pipeline_id resource.kanban_pipeline_id
+json.auto_create_on_conversation resource.auto_create_on_conversation
+json.auto_assign_task_to_agent resource.auto_assign_task_to_agent
+json.auto_assign_conversation_to_agent resource.auto_assign_conversation_to_agent
+json.auto_resolve_conversation_on_finish resource.auto_resolve_conversation_on_finish
+json.auto_win_task_on_resolve resource.auto_win_task_on_resolve
+json.round_robin_assignment resource.round_robin_assignment
+json.target_inbox_ids resource.target_inbox_ids

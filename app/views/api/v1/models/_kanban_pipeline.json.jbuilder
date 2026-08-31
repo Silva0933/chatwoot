@@ -9,3 +9,10 @@ json.stages do
     json.partial! 'api/v1/models/kanban_stage', formats: [:json], resource: stage
   end
 end
+if resource.automation.present?
+  json.automation do
+    json.partial! 'api/v1/models/kanban_automation', formats: [:json], resource: resource.automation
+  end
+else
+  json.automation nil
+end

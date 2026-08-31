@@ -1,6 +1,23 @@
 import types from '../mutation-types';
-import { KanbanPipelines, KanbanTasks } from '../../api/kanban';
+import {
+  KanbanPipelines,
+  KanbanStages,
+  KanbanAutomations,
+  KanbanTasks,
+} from '../../api/kanban';
 import * as MutationHelpers from 'shared/helpers/vuex/mutationHelpers';
+
+// Settings writes all follow the same shape: flag the UI as busy, hit the API and
+// then reload the pipelines so the board and the settings screen agree.
+const withSettingsFlag = async ({ commit, dispatch }, request) => {
+  commit(types.SET_KANBAN_UI_FLAG, { isSavingSettings: true });
+  try {
+    await request();
+    await dispatch('fetchPipelines');
+  } finally {
+    commit(types.SET_KANBAN_UI_FLAG, { isSavingSettings: false });
+  }
+};
 
 export const state = {
   pipelines: [],
@@ -10,7 +27,9 @@ export const state = {
     isFetchingPipelines: false,
     isFetchingTasks: false,
     isMoving: false,
+    isSavingSettings: false,
   },
+  templates: [],
 };
 
 export const getters = {
@@ -34,6 +53,15 @@ export const getters = {
   },
   getUIFlags($state) {
     return $state.uiFlags;
+  },
+  getTemplates($state) {
+    return $state.templates;
+  },
+  getTaskCountByStage: $state => {
+    return $state.records.reduce((counts, task) => {
+      counts[task.stage_id] = (counts[task.stage_id] || 0) + 1;
+      return counts;
+    }, {});
   },
 };
 
@@ -102,6 +130,63 @@ export const actions = {
     }
   },
 
+  fetchTemplates: async ({ commit, state: $state }) => {
+    if ($state.templates.length) return $state.templates;
+
+    const { data } = await KanbanPipelines.templates();
+    commit(types.SET_KANBAN_TEMPLATES, data.payload);
+    return data.payload;
+  },
+
+  updatePipeline: async ({ commit }, { id, ...payload }) => {
+    const { data } = await KanbanPipelines.update(id, { pipeline: payload });
+    commit(types.EDIT_KANBAN_PIPELINE, data);
+    return data;
+  },
+
+  deletePipeline: async ({ commit, dispatch }, id) => {
+    await KanbanPipelines.delete(id);
+    commit(types.DELETE_KANBAN_PIPELINE, id);
+    await dispatch('fetchPipelines');
+  },
+
+  // Every stage write refetches the pipelines instead of patching state by hand:
+  // renaming a terminal column can silently demote another one server-side, so the
+  // returned stage alone is not enough to keep the board honest.
+  createStage: async ({ commit, dispatch }, { pipelineId, ...stage }) => {
+    await withSettingsFlag({ commit, dispatch }, () =>
+      KanbanStages.create(pipelineId, stage)
+    );
+  },
+
+  updateStage: async ({ commit, dispatch }, { pipelineId, id, ...stage }) => {
+    await withSettingsFlag({ commit, dispatch }, () =>
+      KanbanStages.update(pipelineId, id, stage)
+    );
+  },
+
+  deleteStage: async (
+    { commit, dispatch, state: $state },
+    { pipelineId, id, moveTasksToStageId }
+  ) => {
+    await withSettingsFlag({ commit, dispatch }, () =>
+      KanbanStages.delete(pipelineId, id, { moveTasksToStageId })
+    );
+    await dispatch('fetchTasks', { pipelineId: $state.activePipelineId });
+  },
+
+  reorderStages: async ({ commit, dispatch }, { pipelineId, stageIds }) => {
+    await withSettingsFlag({ commit, dispatch }, () =>
+      KanbanStages.reorder(pipelineId, stageIds)
+    );
+  },
+
+  updateAutomation: async ({ commit, dispatch }, { pipelineId, ...automation }) => {
+    await withSettingsFlag({ commit, dispatch }, () =>
+      KanbanAutomations.update(pipelineId, automation)
+    );
+  },
+
   updateTask: async ({ commit }, { id, ...payload }) => {
     const { data } = await KanbanTasks.update(id, { task: payload });
     commit(types.EDIT_KANBAN_TASK, data);
@@ -123,6 +208,18 @@ export const mutations = {
   },
   [types.ADD_KANBAN_PIPELINE]($state, data) {
     $state.pipelines.push(data);
+  },
+  [types.EDIT_KANBAN_PIPELINE]($state, data) {
+    $state.pipelines = $state.pipelines.map(pipeline =>
+      pipeline.id === data.id ? data : pipeline
+    );
+  },
+  [types.DELETE_KANBAN_PIPELINE]($state, id) {
+    $state.pipelines = $state.pipelines.filter(pipeline => pipeline.id !== id);
+    if ($state.activePipelineId === id) $state.activePipelineId = null;
+  },
+  [types.SET_KANBAN_TEMPLATES]($state, data) {
+    $state.templates = data;
   },
   [types.SET_KANBAN_ACTIVE_PIPELINE]($state, pipelineId) {
     $state.activePipelineId = pipelineId;
