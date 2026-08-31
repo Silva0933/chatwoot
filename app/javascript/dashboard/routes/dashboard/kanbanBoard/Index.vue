@@ -46,8 +46,11 @@ const isLoading = computed(
 
 // Filtering runs over the cards already in memory. The board loads the whole
 // pipeline anyway, so a round trip per filter change would only add latency.
+//
+// tasksByStage is a ref holding the getter, and only templates unwrap refs for
+// you. Calling it from script has to go through .value.
 const visibleTasks = stageId => {
-  const filtered = tasksByStage(stageId).filter(task => {
+  const filtered = tasksByStage.value(stageId).filter(task => {
     if (agentFilter.value && task.assigned_agent?.id !== agentFilter.value) {
       return false;
     }
