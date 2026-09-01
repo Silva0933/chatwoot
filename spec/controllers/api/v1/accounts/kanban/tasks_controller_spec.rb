@@ -20,6 +20,28 @@ RSpec.describe 'Kanban Tasks API', type: :request do
       expect(response).to have_http_status(:unauthorized)
     end
 
+    # An administrator returns from the policy scope before it builds the pipeline
+    # subquery, so every board this endpoint served was served to an administrator
+    # and the 500 an agent got went unseen.
+    it 'loads the board for an agent' do
+      get base_url, params: { pipeline_id: pipeline.id }, headers: agent.create_new_auth_token, as: :json
+
+      expect(response).to have_http_status(:success)
+      expect(response.parsed_body['payload'].length).to eq(1)
+    end
+
+    it 'hides a funnel the agent is not a member of' do
+      other_pipeline = create(:kanban_pipeline, account: account)
+      other_stage = create(:kanban_stage, account: account, pipeline: other_pipeline, position: 0)
+      create(:kanban_task, account: account, pipeline: other_pipeline, stage: other_stage)
+      other_pipeline.pipeline_members.create!(user: create(:user, account: account, role: :agent))
+
+      get base_url, headers: agent.create_new_auth_token, as: :json
+
+      pipeline_ids = response.parsed_body['payload'].pluck('pipeline_id')
+      expect(pipeline_ids).to all(eq(pipeline.id))
+    end
+
     # The card falls back to the conversation for what it is about, and the newest
     # message is the one that says where the conversation stands.
     it 'previews the last message of the conversation' do

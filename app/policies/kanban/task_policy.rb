@@ -50,8 +50,19 @@ class Kanban::TaskPolicy < ApplicationPolicy
 
     private
 
+    # reorder(nil) is load-bearing. Kanban::Pipeline carries a default_scope that
+    # orders by position, and the pipeline scope ends in .distinct; narrowing that
+    # to :id leaves Postgres with "SELECT DISTINCT id ... ORDER BY position", which
+    # it refuses: "for SELECT DISTINCT, ORDER BY expressions must appear in select
+    # list". The board answered 500 to every agent who was not an administrator —
+    # administrators return before this line, which is why nobody saw it. A
+    # subquery feeding an IN has no use for an order anyway.
     def visible_pipeline_ids
-      Kanban::PipelinePolicy::Scope.new(@user_context, @account.kanban_pipelines).resolve.select(:id)
+      Kanban::PipelinePolicy::Scope
+        .new(@user_context, @account.kanban_pipelines)
+        .resolve
+        .reorder(nil)
+        .select(:id)
     end
   end
 end
