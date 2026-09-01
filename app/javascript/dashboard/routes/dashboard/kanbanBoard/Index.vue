@@ -198,17 +198,24 @@ const onPipelineDeleted = () => {
       />
 
       <div class="flex flex-wrap items-center gap-2 ml-auto">
-        <div class="relative">
+        <!-- The box is drawn by the wrapper and the input is stripped bare. The
+             app's form reset outranks utilities on an input through a long :not()
+             chain — it was taking the height, the padding, the border and a 16px
+             bottom margin — and neutralising the input once beats bang-modifying
+             every property it touches. -->
+        <div
+          class="flex items-center h-8 gap-1.5 px-2.5 border rounded-lg w-36 lg:w-56 bg-n-alpha-1 border-n-weak focus-within:border-n-brand"
+        >
           <Icon
             icon="i-lucide-search"
-            class="absolute -translate-y-1/2 pointer-events-none ltr:left-2.5 rtl:right-2.5 top-1/2 size-3.5 text-n-slate-10"
+            class="flex-shrink-0 size-3.5 text-n-slate-10"
           />
           <input
             v-model="searchQuery"
             type="search"
             :placeholder="t('KANBAN.FILTERS.SEARCH_PLACEHOLDER')"
             :aria-label="t('KANBAN.FILTERS.SEARCH')"
-            class="h-8 w-36 lg:w-56 text-xs rounded-lg border ltr:pl-8 ltr:pr-2 rtl:pr-8 rtl:pl-2 bg-n-alpha-1 border-n-weak text-n-slate-12 placeholder:text-n-slate-10 focus:outline-none focus:border-n-brand"
+            class="w-full min-w-0 bg-transparent border-0 !h-auto !p-0 !m-0 !text-xs !shadow-none !rounded-none text-n-slate-12 placeholder:text-n-slate-10 focus:!outline-none focus:!shadow-none"
           />
         </div>
 
