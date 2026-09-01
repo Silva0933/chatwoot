@@ -235,7 +235,16 @@ export const actions = {
     { task, performer }
   ) => {
     if (!task || task.pipeline_id !== $state.activePipelineId) return;
-    if (performer?.id === rootGetters.getCurrentUserID) return;
+
+    // The performer is the Chatwoot user the action was billed to, not the browser
+    // tab that caused it. An AI agent moving a card through the API authenticates
+    // with a human's access token, so "the performer is me" does not mean "my board
+    // already shows it". Skip only when the local card matches the broadcast, which
+    // is the case this guard was written for: the agent who just dropped it.
+    const local = $state.records.find(record => record.id === task.id);
+    const alreadyApplied =
+      local?.stage_id === task.stage_id && local?.position === task.position;
+    if (performer?.id === rootGetters.getCurrentUserID && alreadyApplied) return;
 
     const { data } = await KanbanTasks.show(task.id);
     const exists = $state.records.some(record => record.id === data.id);

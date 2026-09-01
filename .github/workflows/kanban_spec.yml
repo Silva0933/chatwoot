@@ -74,3 +74,24 @@ jobs:
             spec/services/kanban \
             spec/controllers/api/v1/accounts/kanban \
             spec/listeners/kanban_listener_spec.rb
+
+  # The board's own bugs have all been frontend ones, and `vite build` only proves
+  # the file parses. This runs the store's specs, where the real-time sync lives.
+  js:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --ignore-scripts
+
+      - name: Run Kanban store specs
+        run: pnpm vitest run app/javascript/dashboard/store/modules/specs/kanban --no-coverage
