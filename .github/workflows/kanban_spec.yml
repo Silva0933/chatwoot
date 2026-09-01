@@ -93,5 +93,5 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --ignore-scripts
 
-      - name: Run Kanban store specs
-        run: pnpm vitest run app/javascript/dashboard/store/modules/specs/kanban --no-coverage
+      - name: Run Kanban JS specs
+        run: TZ=UTC pnpm vitest run --no-coverage app/javascript/dashboard/store/modules/specs/kanban app/javascript/dashboard/routes/dashboard/kanbanBoard/specs

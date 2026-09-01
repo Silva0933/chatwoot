@@ -116,6 +116,12 @@ export const readableTextOn = hex => {
   return (r * 299 + g * 587 + b * 114) / 1000 > 150 ? '#111111' : '#FFFFFF';
 };
 
+// Chatwoot stores the locale as pt_BR, and the Intl machinery behind
+// toLocaleString wants BCP 47, which is pt-BR. Handed the stored value it throws
+// a RangeError, and because these formatters run inside computeds the error
+// escapes and Vue drops the whole column. Normalise once, where both read it.
+const bcp47 = locale => locale?.replace('_', '-');
+
 // Near dates read better as words: "Hoje" tells an agent to act, "31 de out."
 // makes them do the arithmetic themselves.
 export const formatDueDate = (dueDate, t, locale) => {
@@ -132,7 +138,7 @@ export const formatDueDate = (dueDate, t, locale) => {
   if (days === 1) return t('KANBAN.CARD.DUE_TOMORROW');
   if (days === -1) return t('KANBAN.CARD.DUE_YESTERDAY');
 
-  return due.toLocaleDateString(locale, { day: 'numeric', month: 'short' });
+  return due.toLocaleDateString(bcp47(locale), { day: 'numeric', month: 'short' });
 };
 
 export const SORT_OPTIONS = [
@@ -177,7 +183,7 @@ export const sortTasks = (tasks, sortBy) => {
 // place that turns them back into currency.
 export const formatMoney = (cents, locale) => {
   if (!cents) return null;
-  return (cents / 100).toLocaleString(locale || 'pt-BR', {
+  return (cents / 100).toLocaleString(bcp47(locale) || 'pt-BR', {
     style: 'currency',
     currency: 'BRL',
     maximumFractionDigits: 0,
