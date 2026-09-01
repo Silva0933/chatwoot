@@ -19,7 +19,9 @@
       "EMPTY": "Este funil ainda não tem etapas.",
       "COLUMN_VALUE": "Soma dos negócios nesta coluna",
       "WIP_LIMIT": "Limite de cards: {limit}",
-      "WIP_EXCEEDED": "Coluna acima do limite — é aqui que o funil está travando"
+      "WIP_EXCEEDED": "Coluna acima do limite — é aqui que o funil está travando",
+      "COLUMN_VALUE_SHORT": "Total",
+      "EMPTY_STAGE_ACTION": "Adicionar o primeiro card"
     },
     "CARD": {
       "UNKNOWN_CONTACT": "Contato sem nome",
@@ -28,7 +30,10 @@
       "TIME_DAYS": "{count}d",
       "DUE_TODAY": "Hoje",
       "DUE_TOMORROW": "Amanhã",
-      "DUE_YESTERDAY": "Ontem"
+      "DUE_YESTERDAY": "Ontem",
+      "ACTIONS": "Ações do card",
+      "OPEN_CONVERSATION": "Abrir conversa",
+      "TIME_IN_STAGE": "Tempo nesta etapa"
     },
     "PRIORITY": {
       "URGENT": "Urgente",
@@ -144,7 +149,15 @@
       "SORT_MANUAL": "Ordem manual",
       "SORT_DUE": "Vencimento",
       "SORT_PRIORITY": "Prioridade",
-      "SORT_OLDEST": "Mais tempo parado"
+      "SORT_OLDEST": "Mais tempo parado",
+      "SEARCH": "Buscar cards",
+      "SEARCH_PLACEHOLDER": "Nome, telefone, e-mail…"
+    },
+    "STATS": {
+      "ON_TIME": "No prazo",
+      "DUE_TODAY": "Vence hoje",
+      "OVERDUE": "Atrasados",
+      "TOTAL_VALUE": "Valor total no funil"
     }
   }
 }

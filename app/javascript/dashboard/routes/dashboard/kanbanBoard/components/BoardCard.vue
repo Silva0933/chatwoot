@@ -3,13 +3,20 @@ import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import Avatar from 'dashboard/components-next/avatar/Avatar.vue';
 import Icon from 'dashboard/components-next/icon/Icon.vue';
+import DropdownContainer from 'dashboard/components-next/dropdown-menu/base/DropdownContainer.vue';
+import DropdownBody from 'dashboard/components-next/dropdown-menu/base/DropdownBody.vue';
+import DropdownSection from 'dashboard/components-next/dropdown-menu/base/DropdownSection.vue';
+import DropdownItem from 'dashboard/components-next/dropdown-menu/base/DropdownItem.vue';
 import {
   CHANNEL_ICONS,
   DEFAULT_CHANNEL_ICON,
   CHANNEL_META,
   DEFAULT_CHANNEL_META,
   PRIORITY_GLYPHS,
+  PRIORITY_SPINE,
+  DEFAULT_PRIORITY_SPINE,
   SLA_STATE,
+  SLA_PILL,
   slaStateFor,
   formatDueDate,
   formatMoney,
@@ -19,12 +26,27 @@ const props = defineProps({
   task: { type: Object, required: true },
 });
 
-defineEmits(['open', 'edit']);
+const emit = defineEmits(['open', 'edit']);
 
 const { t, locale } = useI18n();
 
 const contactName = computed(
   () => props.task.contact?.name || t('KANBAN.CARD.UNKNOWN_CONTACT')
+);
+
+// Phone first, e-mail as the fallback: on a WhatsApp funnel the number is what
+// someone actually recognises a patient by.
+const contactHandle = computed(
+  () => props.task.contact?.phone_number || props.task.contact?.email || null
+);
+
+// Cards opened automatically from a conversation are titled after the contact, so
+// printing both lines would say the same name twice. The title earns a line of
+// its own only once someone has given the card a subject.
+const subject = computed(() =>
+  props.task.title && props.task.title !== props.task.contact?.name
+    ? props.task.title
+    : null
 );
 
 const channel = computed(
@@ -39,6 +61,10 @@ const priority = computed(
   () => PRIORITY_GLYPHS[props.task.priority] || PRIORITY_GLYPHS.medium
 );
 
+const spine = computed(
+  () => PRIORITY_SPINE[props.task.priority] || DEFAULT_PRIORITY_SPINE
+);
+
 // Read through the same fallback as the glyph. Calling toUpperCase on the raw
 // field in the template would throw on a card without one, and a TypeError in a
 // child template takes the whole board down with it.
@@ -48,13 +74,9 @@ const priorityLabel = computed(() =>
 
 const slaState = computed(() => slaStateFor(props.task.due_date));
 
-// Only a due date that is close or past earns colour. Painting every date amber
-// would leave nothing for the ones that actually need attention today.
-const dueClass = computed(() => {
-  if (slaState.value === SLA_STATE.OVERDUE) return 'text-n-ruby-11';
-  if (slaState.value === SLA_STATE.DUE_TODAY) return 'text-n-amber-11';
-  return 'text-n-slate-10';
-});
+const slaPill = computed(
+  () => SLA_PILL[slaState.value] || SLA_PILL[SLA_STATE.ON_TRACK]
+);
 
 const dealValue = computed(() =>
   formatMoney(props.task.value_cents, locale.value)
@@ -75,64 +97,90 @@ const timeInStage = computed(() => {
 
   return t('KANBAN.CARD.TIME_DAYS', { count: Math.floor(hours / 24) });
 });
+
 </script>
 
 <template>
   <div
-    class="group flex flex-col gap-2 p-3 rounded-xl cursor-pointer bg-n-solid-2 border border-n-weak hover:border-n-slate-7 transition-colors"
+    class="relative flex flex-col gap-2.5 p-3 border border-l-[3px] rounded-xl cursor-pointer group bg-n-solid-2 border-n-weak hover:bg-n-solid-3 hover:border-n-slate-6 transition-colors"
+    :class="spine"
     tabindex="0"
-    @click="$emit('open', task)"
-    @keydown.enter="$emit('open', task)"
+    @click="emit('open', task)"
+    @keydown.enter="emit('open', task)"
   >
-    <div class="flex items-start gap-2">
-      <h4 class="flex-1 min-w-0 m-0 text-sm font-medium truncate text-n-slate-12">
-        {{ contactName }}
-      </h4>
-      <button
-        type="button"
-        class="flex-shrink-0 p-0.5 rounded opacity-0 group-hover:opacity-100 focus:opacity-100 text-n-slate-10 hover:text-n-slate-12 hover:bg-n-solid-3 transition-opacity"
-        :aria-label="t('KANBAN.TASK.EDIT_TITLE')"
-        @click.stop="$emit('edit', task)"
-      >
-        <Icon icon="i-lucide-pencil" class="size-3.5" />
-      </button>
-    </div>
-
-    <div class="flex items-center justify-between gap-2">
+    <div class="flex items-start gap-2.5">
       <span class="relative flex-shrink-0">
         <Avatar
           :name="contactName"
           :src="task.contact?.thumbnail"
-          :size="26"
+          :size="30"
           rounded-full
         />
         <span
           class="absolute flex items-center justify-center rounded-full -bottom-0.5 -right-0.5 size-3.5 bg-n-solid-2 ring-2 ring-n-solid-2"
           :style="{ color: channel.dot }"
+          :title="channel.label"
         >
           <Icon :icon="channelIcon" class="size-2.5" />
         </span>
       </span>
 
-      <Avatar
-        v-if="task.assigned_agent"
-        :name="task.assigned_agent.name"
-        :src="task.assigned_agent.thumbnail"
-        :size="26"
-        rounded-full
-      />
-      <span
-        v-else
-        class="flex items-center justify-center border border-dashed rounded-full size-[26px] border-n-slate-6 text-n-slate-9"
-        :title="t('KANBAN.TASK.UNASSIGNED')"
-      >
-        <Icon icon="i-lucide-user" class="size-3" />
-      </span>
+      <div class="flex-1 min-w-0">
+        <h4
+          class="m-0 text-[13px] font-semibold leading-tight truncate text-n-slate-12"
+        >
+          {{ contactName }}
+        </h4>
+        <p
+          v-if="contactHandle"
+          class="m-0 mt-0.5 text-[10px] leading-tight truncate text-n-slate-10 tabular-nums"
+        >
+          {{ contactHandle }}
+        </p>
+      </div>
+
+      <DropdownContainer class="flex-shrink-0 !space-y-0" @click.stop>
+        <template #trigger="{ toggle, isOpen }">
+          <button
+            type="button"
+            class="flex items-center justify-center transition-opacity rounded-md size-6 text-n-slate-10 hover:text-n-slate-12 hover:bg-n-alpha-2 opacity-0 group-hover:opacity-100 focus:opacity-100"
+            :class="{ '!opacity-100': isOpen }"
+            :aria-label="t('KANBAN.CARD.ACTIONS')"
+            aria-haspopup="menu"
+            :aria-expanded="isOpen"
+            @click="toggle"
+          >
+            <Icon icon="i-lucide-ellipsis" class="size-4" />
+          </button>
+        </template>
+        <DropdownBody class="z-50 mt-1 min-w-44">
+          <DropdownSection>
+            <DropdownItem
+              :label="t('KANBAN.TASK.EDIT_TITLE')"
+              icon="i-lucide-pencil"
+              :click="() => emit('edit', task)"
+            />
+            <DropdownItem
+              v-if="task.conversation_id"
+              :label="t('KANBAN.CARD.OPEN_CONVERSATION')"
+              icon="i-lucide-message-square"
+              :click="() => emit('open', task)"
+            />
+          </DropdownSection>
+        </DropdownBody>
+      </DropdownContainer>
     </div>
+
+    <p
+      v-if="subject"
+      class="m-0 text-xs leading-relaxed text-n-slate-11 line-clamp-2"
+    >
+      {{ subject }}
+    </p>
 
     <div class="flex items-center justify-between gap-2">
       <span
-        class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-n-solid-3 text-[11px] leading-none text-n-slate-11"
+        class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-n-alpha-1 text-[11px] leading-none text-n-slate-11"
       >
         <span
           class="rounded-full size-1.5"
@@ -142,25 +190,26 @@ const timeInStage = computed(() => {
       </span>
       <span
         v-if="dealValue"
-        class="text-[11px] font-medium leading-none tabular-nums text-n-teal-11"
+        class="text-[13px] font-semibold leading-none tabular-nums text-n-teal-11"
       >
         {{ dealValue }}
       </span>
     </div>
 
-    <div class="flex items-center justify-between gap-2 pt-0.5">
-      <Icon
-        :icon="priority.icon"
-        class="flex-shrink-0 size-4"
-        :class="priority.class"
-        :title="priorityLabel"
-      />
-
-      <div class="flex items-center gap-2.5 text-[11px] leading-none">
+    <div
+      class="flex items-center justify-between gap-2 pt-2.5 border-t border-n-weak"
+    >
+      <div class="flex items-center min-w-0 gap-2">
+        <Icon
+          :icon="priority.icon"
+          class="flex-shrink-0 size-4"
+          :class="priority.class"
+          :title="priorityLabel"
+        />
         <span
           v-if="dueLabel"
-          class="flex items-center gap-1 tabular-nums"
-          :class="dueClass"
+          class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] leading-none tabular-nums"
+          :class="slaPill"
         >
           <Icon
             :icon="
@@ -172,9 +221,29 @@ const timeInStage = computed(() => {
           />
           {{ dueLabel }}
         </span>
-        <span class="flex items-center gap-1 text-n-slate-10 tabular-nums">
+      </div>
+
+      <div class="flex items-center flex-shrink-0 gap-2">
+        <span
+          class="flex items-center gap-1 text-[10px] leading-none text-n-slate-10 tabular-nums"
+          :title="t('KANBAN.CARD.TIME_IN_STAGE')"
+        >
           <Icon icon="i-lucide-clock" class="size-3" />
           {{ timeInStage }}
+        </span>
+        <Avatar
+          v-if="task.assigned_agent"
+          :name="task.assigned_agent.name"
+          :src="task.assigned_agent.thumbnail"
+          :size="22"
+          rounded-full
+        />
+        <span
+          v-else
+          class="flex items-center justify-center border border-dashed rounded-full size-[22px] border-n-slate-6 text-n-slate-9"
+          :title="t('KANBAN.TASK.UNASSIGNED')"
+        >
+          <Icon icon="i-lucide-user" class="size-3" />
         </span>
       </div>
     </div>

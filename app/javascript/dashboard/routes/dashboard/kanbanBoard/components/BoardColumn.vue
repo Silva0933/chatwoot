@@ -3,6 +3,7 @@ import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import Draggable from 'vuedraggable';
 import Icon from 'dashboard/components-next/icon/Icon.vue';
+import { provideDropdownTeleport } from 'dashboard/components-next/dropdown-menu/base/provider.js';
 import BoardCard from './BoardCard.vue';
 import { formatDuration, readableTextOn, formatMoney } from '../constants';
 
@@ -22,6 +23,11 @@ const emit = defineEmits([
 ]);
 
 const { t, locale } = useI18n();
+
+// The card list scrolls inside the column, which would clip a card menu opened
+// near the bottom. Teleporting the menus to <body> is what the primitives offer
+// for exactly this case.
+provideDropdownTeleport();
 
 const headerText = computed(() => readableTextOn(props.stage.color_hex));
 
@@ -44,6 +50,15 @@ const onHeaderSoft = computed(() =>
   headerText.value === '#FFFFFF' ? 'rgba(0,0,0,0.22)' : 'rgba(255,255,255,0.35)'
 );
 
+// Won and lost are where the funnel ends, and the eye should be able to find them
+// without reading the headers. The colour is the border only — filling the column
+// would compete with the cards inside it.
+const outline = computed(() => {
+  if (props.stage.is_won_stage) return 'border-n-teal-8/70';
+  if (props.stage.is_lost_stage) return 'border-n-ruby-8/70';
+  return 'border-n-weak';
+});
+
 // vuedraggable mutates the bound list; the board owns the source of truth, so the
 // column reports the intent and lets the parent reconcile with the server.
 const draggableList = computed({
@@ -65,7 +80,8 @@ const onChange = event => {
 
 <template>
   <div
-    class="flex flex-col flex-shrink-0 w-[85vw] max-w-[290px] sm:w-[290px] h-full min-h-0 overflow-hidden border rounded-xl border-n-weak bg-n-solid-1"
+    class="flex flex-col flex-shrink-0 w-[85vw] max-w-[300px] sm:w-[300px] h-full min-h-0 overflow-hidden border rounded-2xl bg-n-solid-1"
+    :class="outline"
   >
     <header
       class="flex items-center gap-2 px-3 py-2"
@@ -114,10 +130,15 @@ const onChange = event => {
 
     <div
       v-if="columnValue"
-      class="px-3 py-1 text-[11px] font-medium text-right border-b border-n-weak text-n-teal-11 bg-n-solid-2 tabular-nums"
+      class="flex items-center justify-between gap-2 px-3 py-1.5 text-[11px] border-b border-n-weak bg-n-solid-2"
       :title="t('KANBAN.BOARD.COLUMN_VALUE')"
     >
-      {{ columnValue }}
+      <span class="uppercase tracking-wide text-[10px] text-n-slate-10">
+        {{ t('KANBAN.BOARD.COLUMN_VALUE_SHORT') }}
+      </span>
+      <span class="font-semibold text-n-teal-11 tabular-nums">
+        {{ columnValue }}
+      </span>
     </div>
 
     <div
@@ -158,12 +179,24 @@ const onChange = event => {
         />
       </template>
       <template #footer>
-        <p
+        <!-- An empty column is the one place on the board with room to say what to
+             do next, and the drop target reads better outlined than as a caption. -->
+        <component
+          :is="canEdit ? 'button' : 'div'"
           v-if="!tasks.length"
-          class="py-8 m-0 text-xs italic text-center text-n-slate-9"
+          :type="canEdit ? 'button' : null"
+          class="flex flex-col items-center justify-center w-full gap-1.5 py-10 text-xs transition-colors border border-dashed rounded-xl border-n-weak text-n-slate-10"
+          :class="
+            canEdit ? 'hover:border-n-slate-6 hover:text-n-slate-11' : 'cursor-default'
+          "
+          @click="canEdit && emit('add-task', stage)"
         >
-          {{ t('KANBAN.BOARD.EMPTY_STAGE') }}
-        </p>
+          <Icon v-if="canEdit" icon="i-lucide-plus" class="size-4" />
+          <span>{{ t('KANBAN.BOARD.EMPTY_STAGE') }}</span>
+          <span v-if="canEdit" class="text-n-slate-9">
+            {{ t('KANBAN.BOARD.EMPTY_STAGE_ACTION') }}
+          </span>
+        </component>
       </template>
     </Draggable>
   </div>

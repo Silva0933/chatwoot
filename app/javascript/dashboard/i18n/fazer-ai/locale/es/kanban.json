@@ -19,7 +19,9 @@
       "EMPTY": "Este embudo aún no tiene etapas.",
       "COLUMN_VALUE": "Suma de los negocios en esta columna",
       "WIP_LIMIT": "Límite de tarjetas: {limit}",
-      "WIP_EXCEEDED": "Columna por encima del límite: aquí es donde el embudo se traba"
+      "WIP_EXCEEDED": "Columna por encima del límite: aquí es donde el embudo se traba",
+      "COLUMN_VALUE_SHORT": "Total",
+      "EMPTY_STAGE_ACTION": "Agregar la primera tarjeta"
     },
     "CARD": {
       "UNKNOWN_CONTACT": "Contacto sin nombre",
@@ -28,7 +30,10 @@
       "TIME_DAYS": "{count}d",
       "DUE_TODAY": "Hoy",
       "DUE_TOMORROW": "Mañana",
-      "DUE_YESTERDAY": "Ayer"
+      "DUE_YESTERDAY": "Ayer",
+      "ACTIONS": "Acciones de la tarjeta",
+      "OPEN_CONVERSATION": "Abrir conversación",
+      "TIME_IN_STAGE": "Tiempo en esta etapa"
     },
     "PRIORITY": {
       "URGENT": "Urgente",
@@ -144,7 +149,15 @@
       "SORT_MANUAL": "Orden manual",
       "SORT_DUE": "Vencimiento",
       "SORT_PRIORITY": "Prioridad",
-      "SORT_OLDEST": "Más tiempo esperando"
+      "SORT_OLDEST": "Más tiempo esperando",
+      "SEARCH": "Buscar tarjetas",
+      "SEARCH_PLACEHOLDER": "Nombre, teléfono, e-mail…"
+    },
+    "STATS": {
+      "ON_TIME": "En plazo",
+      "DUE_TODAY": "Vence hoy",
+      "OVERDUE": "Atrasados",
+      "TOTAL_VALUE": "Total en el embudo"
     }
   }
 }

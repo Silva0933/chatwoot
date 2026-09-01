@@ -15,11 +15,11 @@ import PipelineSwitcher from './components/PipelineSwitcher.vue';
 import PipelineSettings from './components/PipelineSettings.vue';
 import NewPipelineDialog from './components/NewPipelineDialog.vue';
 import TaskDialog from './components/TaskDialog.vue';
-import { SORT_OPTIONS, sortTasks } from './constants';
+import { SORT_OPTIONS, sortTasks, boardStats, formatMoney } from './constants';
 
 const store = useStore();
 const router = useRouter();
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const { accountId } = useAccount();
 const { isAdmin } = useAdmin();
 
@@ -29,6 +29,7 @@ const taskDialogRef = ref(null);
 const showMetrics = ref(false);
 const agentFilter = ref('');
 const inboxFilter = ref('');
+const searchQuery = ref('');
 const sortBy = ref(SORT_OPTIONS[0].value);
 
 const pipelines = useMapGetter('kanban/getPipelines');
@@ -49,22 +50,49 @@ const isLoading = computed(
 //
 // tasksByStage is a ref holding the getter, and only templates unwrap refs for
 // you. Calling it from script has to go through .value.
+// Someone looking for one patient knows the name or the number, not which stage
+// the card sits in, so the search runs across the whole board at once.
+const matchesSearch = task => {
+  const term = searchQuery.value.trim().toLowerCase();
+  if (!term) return true;
+
+  return [
+    task.title,
+    task.contact?.name,
+    task.contact?.phone_number,
+    task.contact?.email,
+  ].some(field => String(field || '').toLowerCase().includes(term));
+};
+
 const visibleTasks = stageId => {
   const filtered = tasksByStage.value(stageId).filter(task => {
     if (agentFilter.value && task.assigned_agent?.id !== agentFilter.value) {
       return false;
     }
-    return !(inboxFilter.value && task.inbox_id !== inboxFilter.value);
+    if (inboxFilter.value && task.inbox_id !== inboxFilter.value) return false;
+    return matchesSearch(task);
   });
 
   return sortTasks(filtered, sortBy.value);
 };
 
-const visibleCount = computed(
-  () => stages.value.reduce((sum, s) => sum + visibleTasks(s.id).length, 0)
+const visibleTaskList = computed(() =>
+  stages.value.flatMap(stage => visibleTasks(stage.id))
 );
 
-const isFiltered = computed(() => !!(agentFilter.value || inboxFilter.value));
+const visibleCount = computed(() => visibleTaskList.value.length);
+
+// The strip reports what is on screen, not what is in the database: with a filter
+// on, a total that ignored it would describe a board nobody is looking at.
+const stats = computed(() => boardStats(visibleTaskList.value));
+
+const totalValue = computed(() =>
+  formatMoney(stats.value.valueCents, locale.value)
+);
+
+const isFiltered = computed(
+  () => !!(agentFilter.value || inboxFilter.value || searchQuery.value.trim())
+);
 
 onMounted(async () => {
   await store.dispatch('kanban/fetchPipelines');
@@ -170,6 +198,20 @@ const onPipelineDeleted = () => {
       />
 
       <div class="flex flex-wrap items-center gap-2 ml-auto">
+        <div class="relative">
+          <Icon
+            icon="i-lucide-search"
+            class="absolute -translate-y-1/2 pointer-events-none ltr:left-2.5 rtl:right-2.5 top-1/2 size-3.5 text-n-slate-10"
+          />
+          <input
+            v-model="searchQuery"
+            type="search"
+            :placeholder="t('KANBAN.FILTERS.SEARCH_PLACEHOLDER')"
+            :aria-label="t('KANBAN.FILTERS.SEARCH')"
+            class="h-8 w-36 lg:w-56 text-xs rounded-lg border ltr:pl-8 ltr:pr-2 rtl:pr-8 rtl:pl-2 bg-n-alpha-1 border-n-weak text-n-slate-12 placeholder:text-n-slate-10 focus:outline-none focus:border-n-brand"
+          />
+        </div>
+
         <BoardFilters
           v-model:agent-id="agentFilter"
           v-model:inbox-id="inboxFilter"
@@ -208,6 +250,44 @@ const onPipelineDeleted = () => {
         />
       </div>
     </header>
+
+    <!-- What is late, what is due today, and how much money is on the board. It
+         reads the cards already loaded, so it adds no request of its own. -->
+    <div
+      v-if="stages.length && visibleCount"
+      class="flex flex-wrap items-center flex-shrink-0 px-4 py-1.5 gap-x-5 gap-y-1 text-[11px] border-b border-n-weak bg-n-solid-1 text-n-slate-11"
+    >
+      <span v-if="stats.onTimeRate !== null" class="flex items-center gap-1.5">
+        <span class="rounded-full size-1.5 bg-n-teal-9" />
+        {{ t('KANBAN.STATS.ON_TIME') }}
+        <strong class="font-semibold text-n-slate-12 tabular-nums">
+          {{ stats.onTimeRate }}%
+        </strong>
+      </span>
+      <span class="flex items-center gap-1.5">
+        <span class="rounded-full size-1.5 bg-n-amber-9" />
+        {{ t('KANBAN.STATS.DUE_TODAY') }}
+        <strong class="font-semibold text-n-slate-12 tabular-nums">
+          {{ stats.dueToday }}
+        </strong>
+      </span>
+      <span class="flex items-center gap-1.5">
+        <span class="rounded-full size-1.5 bg-n-ruby-9" />
+        {{ t('KANBAN.STATS.OVERDUE') }}
+        <strong class="font-semibold text-n-slate-12 tabular-nums">
+          {{ stats.overdue }}
+        </strong>
+      </span>
+      <span
+        v-if="totalValue"
+        class="flex items-center gap-1.5 ltr:ml-auto rtl:mr-auto"
+      >
+        {{ t('KANBAN.STATS.TOTAL_VALUE') }}
+        <strong class="font-semibold text-n-teal-11 tabular-nums">
+          {{ totalValue }}
+        </strong>
+      </span>
+    </div>
 
     <p
       v-if="showMetrics && metrics"

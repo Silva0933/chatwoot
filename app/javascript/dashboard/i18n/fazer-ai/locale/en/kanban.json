@@ -19,7 +19,9 @@
       "EMPTY": "This pipeline has no stages yet.",
       "COLUMN_VALUE": "Total deal value in this column",
       "WIP_LIMIT": "Card limit: {limit}",
-      "WIP_EXCEEDED": "Column over its limit - this is where the funnel is stuck"
+      "WIP_EXCEEDED": "Column over its limit - this is where the funnel is stuck",
+      "COLUMN_VALUE_SHORT": "Total",
+      "EMPTY_STAGE_ACTION": "Add the first card"
     },
     "CARD": {
       "UNKNOWN_CONTACT": "Unnamed contact",
@@ -28,7 +30,10 @@
       "TIME_DAYS": "{count}d",
       "DUE_TODAY": "Today",
       "DUE_TOMORROW": "Tomorrow",
-      "DUE_YESTERDAY": "Yesterday"
+      "DUE_YESTERDAY": "Yesterday",
+      "ACTIONS": "Card actions",
+      "OPEN_CONVERSATION": "Open conversation",
+      "TIME_IN_STAGE": "Time in this stage"
     },
     "PRIORITY": {
       "URGENT": "Urgent",
@@ -144,7 +149,15 @@
       "SORT_MANUAL": "Manual order",
       "SORT_DUE": "Due date",
       "SORT_PRIORITY": "Priority",
-      "SORT_OLDEST": "Longest waiting"
+      "SORT_OLDEST": "Longest waiting",
+      "SEARCH": "Search cards",
+      "SEARCH_PLACEHOLDER": "Name, phone, e-mail…"
+    },
+    "STATS": {
+      "ON_TIME": "On time",
+      "DUE_TODAY": "Due today",
+      "OVERDUE": "Overdue",
+      "TOTAL_VALUE": "Total in the funnel"
     }
   }
 }

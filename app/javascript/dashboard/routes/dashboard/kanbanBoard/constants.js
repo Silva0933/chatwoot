@@ -189,3 +189,52 @@ export const formatMoney = (cents, locale) => {
     maximumFractionDigits: 0,
   });
 };
+
+// The priority already has a glyph in the card footer, but a glyph is only read
+// once the eye is on the card. The spine down the left edge is what lets someone
+// find the urgent ones while scanning a full column.
+export const PRIORITY_SPINE = {
+  urgent: 'border-l-n-ruby-9',
+  high: 'border-l-n-amber-9',
+  medium: 'border-l-n-blue-9',
+  low: 'border-l-n-slate-8',
+};
+
+export const DEFAULT_PRIORITY_SPINE = PRIORITY_SPINE.medium;
+
+// The due date is the one thing on the card that can mean "act now", so past and
+// present due dates get a filled pill; everything further out stays quiet.
+export const SLA_PILL = {
+  [SLA_STATE.OVERDUE]: 'bg-n-ruby-3 text-n-ruby-11 font-semibold',
+  [SLA_STATE.DUE_TODAY]: 'bg-n-amber-3 text-n-amber-11 font-semibold',
+  [SLA_STATE.ON_TRACK]: 'bg-n-alpha-1 text-n-slate-11',
+};
+
+// The strip under the board header answers the three questions someone opens a
+// funnel to ask: what is late, what is due today, and how much money is in play.
+// It reads the cards already in memory, so it costs no request of its own.
+export const boardStats = tasks => {
+  let overdue = 0;
+  let dueToday = 0;
+  let withDueDate = 0;
+  let valueCents = 0;
+
+  tasks.forEach(task => {
+    valueCents += task.value_cents || 0;
+
+    const state = slaStateFor(task.due_date);
+    if (!state) return;
+
+    withDueDate += 1;
+    if (state === SLA_STATE.OVERDUE) overdue += 1;
+    else if (state === SLA_STATE.DUE_TODAY) dueToday += 1;
+  });
+
+  // A card without a due date has no deadline to miss. Counting those as on time
+  // would report 100% on a funnel where nobody set a single date.
+  const onTimeRate = withDueDate
+    ? Math.round(((withDueDate - overdue) / withDueDate) * 100)
+    : null;
+
+  return { overdue, dueToday, valueCents, onTimeRate };
+};
