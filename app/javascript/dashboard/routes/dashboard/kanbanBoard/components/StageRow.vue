@@ -93,6 +93,10 @@ const KIND_OPTIONS = [
       {{ taskCount }}
     </span>
 
+    <!-- Chatwoot's form reset sets width:100% on input[type], and its pile of
+         :not() clauses outranks a plain w-* class, so this box claimed the whole
+         row and squeezed the stage name down to nothing. The bang is how the rest
+         of the app wins that same fight. -->
     <input
       :value="stage.wip_limit"
       type="number"
@@ -100,7 +104,7 @@ const KIND_OPTIONS = [
       :disabled="disabled"
       :placeholder="t('KANBAN.SETTINGS.WIP_SHORT')"
       :title="t('KANBAN.SETTINGS.WIP_LIMIT')"
-      class="flex-shrink-0 w-14 px-1.5 py-1 text-xs text-center bg-transparent border rounded-md border-transparent text-n-slate-11 hover:border-n-weak focus:border-n-brand focus:outline-none"
+      class="flex-shrink-0 !w-20 px-1.5 py-1 text-xs text-center bg-transparent border rounded-md border-transparent text-n-slate-11 hover:border-n-weak focus:border-n-brand focus:outline-none"
       @change="
         emit('update', {
           wip_limit: $event.target.value === '' ? null : Number($event.target.value),
