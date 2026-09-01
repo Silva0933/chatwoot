@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_08_31_230100) do
+ActiveRecord::Schema[7.2].define(version: 2026_09_01_200000) do
   # These extensions should be enabled to support this database
   enable_extension "pg_stat_statements"
   enable_extension "pg_trgm"
@@ -1481,6 +1481,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_08_31_230100) do
     t.datetime "updated_at", null: false
     t.bigint "value_cents", default: 0, null: false
     t.string "loss_reason"
+    t.string "summary"
     t.index ["account_id", "kanban_pipeline_id"], name: "index_kanban_tasks_on_account_id_and_kanban_pipeline_id"
     t.index ["account_id"], name: "index_kanban_tasks_on_account_id"
     t.index ["assigned_agent_id"], name: "index_kanban_tasks_on_assigned_agent_id"

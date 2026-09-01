@@ -5,6 +5,10 @@ json.conversation_id resource.conversation_id
 json.contact_id resource.contact_id
 json.inbox_id resource.inbox_id
 json.title resource.title
+json.summary resource.summary
+# The board index preloads every card's preview in one query and hands it over
+# in @message_previews; the single-card endpoints have one record to ask.
+json.last_message @message_previews ? @message_previews[resource.conversation_id] : resource.message_preview
 json.priority resource.priority
 json.due_date resource.due_date
 json.stage_entered_at resource.stage_entered_at

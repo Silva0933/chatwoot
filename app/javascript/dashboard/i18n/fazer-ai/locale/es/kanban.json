@@ -125,7 +125,10 @@
       "VALUE_PLACEHOLDER": "Ej.: 1500",
       "LOSS_REASON": "Motivo de la pérdida",
       "LOSS_REASON_PLACEHOLDER": "Ej.: precio, se fue a la competencia, dejó de responder",
-      "LOSS_REASON_HINT": "Aparece en Rayos X, agrupado por motivo."
+      "LOSS_REASON_HINT": "Aparece en Rayos X, agrupado por motivo.",
+      "SUMMARY": "Resumen",
+      "SUMMARY_PLACEHOLDER": "De qué se trata esta tarjeta, en tus palabras",
+      "SUMMARY_HINT": "Aparece en la tarjeta. Si lo dejas vacío, la tarjeta muestra el último mensaje de la conversación."
     },
     "METRICS": {
       "TOGGLE": "Rayos X",

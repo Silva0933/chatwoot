@@ -40,14 +40,23 @@ const contactHandle = computed(
   () => props.task.contact?.phone_number || props.task.contact?.email || null
 );
 
-// Cards opened automatically from a conversation are titled after the contact, so
-// printing both lines would say the same name twice. The title earns a line of
-// its own only once someone has given the card a subject.
-const subject = computed(() =>
-  props.task.title && props.task.title !== props.task.contact?.name
-    ? props.task.title
-    : null
-);
+// What the card is about, in order of how deliberate it is: a summary someone
+// wrote, then a title that says more than the contact's name (cards opened from a
+// conversation are titled after the contact, and printing that twice says
+// nothing), then the conversation's last message. The message is marked as such
+// so nobody reads a patient's own words as a note the clinic wrote.
+const summary = computed(() => {
+  const written = props.task.summary?.trim();
+  if (written) return { text: written, fromMessage: false };
+
+  if (props.task.title && props.task.title !== props.task.contact?.name) {
+    return { text: props.task.title, fromMessage: false };
+  }
+
+  return props.task.last_message
+    ? { text: props.task.last_message, fromMessage: true }
+    : null;
+});
 
 const channel = computed(
   () => CHANNEL_META[props.task.channel_type] || DEFAULT_CHANNEL_META
@@ -172,10 +181,11 @@ const timeInStage = computed(() => {
     </div>
 
     <p
-      v-if="subject"
-      class="m-0 text-xs leading-relaxed text-n-slate-11 line-clamp-2"
+      v-if="summary"
+      class="m-0 text-xs leading-relaxed line-clamp-2"
+      :class="summary.fromMessage ? 'italic text-n-slate-10' : 'text-n-slate-11'"
     >
-      {{ subject }}
+      {{ summary.text }}
     </p>
 
     <div class="flex items-center justify-between gap-2">

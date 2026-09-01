@@ -125,7 +125,10 @@
       "VALUE_PLACEHOLDER": "e.g. 1500",
       "LOSS_REASON": "Loss reason",
       "LOSS_REASON_PLACEHOLDER": "e.g. price, went to a competitor, went quiet",
-      "LOSS_REASON_HINT": "Shows in the X-ray, grouped by reason."
+      "LOSS_REASON_HINT": "Shows in the X-ray, grouped by reason.",
+      "SUMMARY": "Summary",
+      "SUMMARY_PLACEHOLDER": "What this card is about, in your own words",
+      "SUMMARY_HINT": "Shown on the card. Left empty, the card falls back to the last message of the conversation."
     },
     "METRICS": {
       "TOGGLE": "X-ray",

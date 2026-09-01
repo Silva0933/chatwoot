@@ -125,7 +125,10 @@
       "VALUE_PLACEHOLDER": "Ex.: 1500",
       "LOSS_REASON": "Motivo da perda",
       "LOSS_REASON_PLACEHOLDER": "Ex.: preço, foi para o concorrente, sumiu",
-      "LOSS_REASON_HINT": "Aparece no Raio-X, agrupado por motivo."
+      "LOSS_REASON_HINT": "Aparece no Raio-X, agrupado por motivo.",
+      "SUMMARY": "Resumo",
+      "SUMMARY_PLACEHOLDER": "Do que se trata este card, nas suas palavras",
+      "SUMMARY_HINT": "Aparece no card. Em branco, o card mostra a última mensagem da conversa."
     },
     "METRICS": {
       "TOGGLE": "Raio-X",

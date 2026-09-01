@@ -43,6 +43,16 @@ class Kanban::Task < ApplicationRecord
     Time.zone.now - stage_entered_at
   end
 
+  # What the card is about, when nobody wrote a summary: the same message the chat
+  # list previews. A card opened from a conversation is titled after the contact,
+  # so without this the board is a column of names.
+  #
+  # Costs a query per call, which is why the board index preloads all of them in
+  # one pass instead (see Kanban::TasksController#message_previews_for).
+  def message_preview
+    conversation&.last_non_activity_message&.content.to_s.squish.presence&.truncate(160)
+  end
+
   def overdue?
     due_date.present? && due_date.past?
   end

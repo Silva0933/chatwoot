@@ -20,6 +20,7 @@ const task = ref(null);
 const isSubmitting = ref(false);
 
 const title = ref('');
+const summary = ref('');
 const stageId = ref(null);
 const priority = ref('medium');
 const dueDate = ref('');
@@ -64,6 +65,7 @@ const toDateInput = value => (value ? value.slice(0, 10) : '');
 const open = (record = null, defaultStageId = null) => {
   task.value = record;
   title.value = record?.title || '';
+  summary.value = record?.summary || '';
   stageId.value = record?.stage_id || defaultStageId || stages.value[0]?.id || null;
   priority.value = record?.priority || 'medium';
   dueDate.value = toDateInput(record?.due_date);
@@ -89,6 +91,7 @@ const onSearchContacts = async query => {
 
 const payload = () => ({
   title: title.value.trim(),
+  summary: summary.value.trim() || null,
   priority: priority.value,
   due_date: dueDate.value || null,
   assigned_agent_id: assignedAgentId.value || null,
@@ -177,6 +180,21 @@ defineExpose({ open });
           type="text"
           class="w-full h-9 px-2.5 text-sm rounded-lg border border-n-weak bg-n-solid-2 text-n-slate-12 focus:border-n-brand focus:outline-none transition-colors"
         />
+      </label>
+
+      <label class="flex flex-col gap-1">
+        <span class="text-sm font-medium text-n-slate-12">
+          {{ t('KANBAN.TASK.SUMMARY') }}
+        </span>
+        <textarea
+          v-model="summary"
+          rows="2"
+          :placeholder="t('KANBAN.TASK.SUMMARY_PLACEHOLDER')"
+          class="w-full px-2.5 py-2 text-sm rounded-lg border resize-none border-n-weak bg-n-solid-2 text-n-slate-12 focus:border-n-brand focus:outline-none transition-colors"
+        />
+        <span class="text-xs text-n-slate-10">
+          {{ t('KANBAN.TASK.SUMMARY_HINT') }}
+        </span>
       </label>
 
       <div class="grid grid-cols-2 gap-3">
